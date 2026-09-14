@@ -17,7 +17,7 @@
 - [ ] **Hybrid approach**  
   Fixed static columns for core/queryable attributes combined with a JSON column for asset-specific attributes.
 
-**Trigger:** S-S1-01
+**Trigger:** S-SP1-01
 
 ---
 
@@ -34,7 +34,7 @@
 - [ ] **Active status**  
   Manage lifecycle via a `status` enumeration (e.g., *active*, *retired*, *disposed*) without deleting records.
 
-**Trigger:** S-S1-01
+**Trigger:** S-SP1-01
 
 ---
 
@@ -51,7 +51,7 @@
 - [ ] **No pagination**  
   Return full collections in a single payload; zero pagination complexity, but introduces latency and memory bottlenecks as the dataset scales.
 
-**Trigger:** S-S1-02
+**Trigger:** S-SP1-02
 
 ---
 
@@ -68,7 +68,7 @@
 - [ ] **Pessimistic locking**  
   Lock target database rows (`SELECT FOR UPDATE`) during read-modify-write; guarantees serialization, but introduces latency and deadlock potential.
 
-**Trigger:** S-S1-01
+**Trigger:** S-SP1-01
 
 ---
 
@@ -87,4 +87,4 @@
 - [ ] **Hybrid approach**  
   Sanitize and validate payload shape at DTO ingress, enforce business invariants in the domain layer, and keep database constraints as a defensive safety net.
 
-**Trigger:** S-S1-01
+**Trigger:** S-SP1-01

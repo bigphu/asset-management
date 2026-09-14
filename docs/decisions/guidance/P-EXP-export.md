@@ -16,7 +16,7 @@
   Offloaded to an isolated microservice or worker pool; prevents heavy reporting tasks from starving the core API of resources.
 
 **Raises:** P-EXP-02, P-EXP-04, P-EXP-05
-**Trigger:** S-S1-03
+**Trigger:** S-SP1-03
 
 ---
 
@@ -52,7 +52,7 @@
 - [ ] **Checkbox for user choice**  
   Provides a UI modal empowering users to explicitly select their desired export scope.
 
-**Trigger:** S-S1-03
+**Trigger:** S-SP1-03
 
 ---
 
@@ -67,7 +67,7 @@
 - [ ] **Response streaming**  
   Write the workbook stream chunk-by-chunk directly to the HTTP response or disk; highly memory-efficient, but requires library support for streaming writers.
 
-**Trigger:** S-S1-03
+**Trigger:** S-SP1-03
 
 ---
 

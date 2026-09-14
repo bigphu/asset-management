@@ -18,7 +18,7 @@
   Combining reusable saved profiles with dynamic template mapping for maximum flexibility.
 
 **Raises:** P-CUS-02, P-CUS-03, P-CUS-04  
-**Trigger:** S-S1-04
+**Trigger:** S-SP1-04
 
 ---
 
@@ -31,7 +31,7 @@
 - [ ] **Comprehensive layout and formatting rules**  
   Supports selected columns, column order, column labels, date/number formatting, sheet names, report titles, free header toggles with auto-fillers, grouping/sorting, and custom column widths.
 
-**Trigger:** S-S1-04
+**Trigger:** S-SP1-04
 
 ---
 

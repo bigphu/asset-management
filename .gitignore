@@ -37,3 +37,12 @@ lerna-debug.log*
 
 # Docker (if applicable)
 .dockerignore
+
+.claude
+
+# Local tooling / personal docs
+/opencode.json
+/.mcp.json
+/CLAUDE.md
+/docs/asset-management-system.md
+/docs/database/

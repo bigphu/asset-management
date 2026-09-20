@@ -24,7 +24,7 @@ record of what was chosen -- for that see
 - **Outbox plus a stream/queue product**
   Combines an outbox table with Change Data Capture (CDC) or log tailing to push events to a broker; highly scalable and reliable, but requires advanced architectural setup.
 
-**Raises:** P-EVT-02, P-EVT-03
+**Raises:** [`P-EVT-02`](#p-evt-02----what-are-the-delivery-guarantees), [`P-EVT-03`](#p-evt-03----how-are-failed-jobs-retried-and-parked)
 
 > **Known hazard.** In-process event emitter degrades badly once long-running and latency-sensitive handlers share one loop. Consider separating queues by workload class early.
 
@@ -45,7 +45,7 @@ record of what was chosen -- for that see
 - **Effectively once via a dedup store**
   Uses an external state store (e.g., Redis) to track processed message IDs to filter out duplicates, simulating exactly-once processing without strictly requiring domain idempotency.
 
-**Bound to:** P-EVT-01
+**Bound to:** [`P-EVT-01`](#p-evt-01----how-are-events-delivered-inside-the-backend)
 
 ---
 

@@ -14,10 +14,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-EXP-01`](../guidance/P-EXP.md) |
+| Problem | [`P-EXP-01`](../guidance/P-EXP.md#p-exp-01----where-is-the-file-generated) |
 | Trigger | S-03 |
 | Sprint | 1 |
-| ADR | ADR-0006 |
+| ADR | [ADR-0006](../../records/adr/0006-backend-server-side.md) |
 
 - [ ] ~~In browser (client-side)~~
 - [x] **Backend (server-side)**
@@ -30,10 +30,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-EXP-02`](../guidance/P-EXP.md) |
+| Problem | [`P-EXP-02`](../guidance/P-EXP.md#p-exp-02----synchronous-response-or-background-job) |
 | Trigger | S-03 |
 | Sprint | 1 |
-| ADR | ADR-0007 |
+| ADR | [ADR-0007](../../records/adr/0007-returned-in-api-response-body-synchronous.md) |
 
 - [x] **Returned in API response body (synchronous)**
 - [ ] ~~Background worker + Download link~~
@@ -48,10 +48,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-EXP-03`](../guidance/P-EXP.md) |
+| Problem | [`P-EXP-03`](../guidance/P-EXP.md#p-exp-03----what-is-the-scope-of-exported-data) |
 | Trigger | S-03 |
 | Sprint | 1 |
-| ADR | ADR-0008 |
+| ADR | [ADR-0008](../../records/adr/0008-all-filtered-rows.md) |
 
 - [ ] ~~The page currently displayed~~
 - [x] **All filtered rows**
@@ -65,10 +65,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-EXP-04`](../guidance/P-EXP.md) |
+| Problem | [`P-EXP-04`](../guidance/P-EXP.md#p-exp-04----is-the-file-buffered-in-memory-or-streamed) |
 | Trigger | S-03 |
 | Sprint | 1 |
-| ADR | ADR-0009 |
+| ADR | [ADR-0009](../../records/adr/0009-in-memory-buffer.md) |
 
 - [x] **In-memory buffer**
 - [ ] ~~Response streaming~~
@@ -82,10 +82,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-EXP-05`](../guidance/P-EXP.md) |
+| Problem | [`P-EXP-05`](../guidance/P-EXP.md#p-exp-05----which-library-generates-the-spreadsheet) |
 | Trigger | S-03 |
 | Sprint | 1 |
-| ADR | ADR-0010 |
+| ADR | [ADR-0010](../../records/adr/0010-exceljs-node-js.md) |
 
 - [x] **ExcelJS (Node.js)**
 - [ ] ~~SheetJS (Node.js)~~

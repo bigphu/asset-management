@@ -22,9 +22,9 @@ record of what was chosen -- for that see
 - **Dedicated report generation service**
   Offloaded to an isolated microservice or worker pool; prevents heavy reporting tasks from starving the core API of resources.
 
-**Raises:** P-EXP-02, P-EXP-04, P-EXP-05
+**Raises:** [`P-EXP-02`](#p-exp-02----synchronous-response-or-background-job), [`P-EXP-04`](#p-exp-04----is-the-file-buffered-in-memory-or-streamed), [`P-EXP-05`](#p-exp-05----which-library-generates-the-spreadsheet)
 
-**Instantiated as:** `P-EXP-01#1` (decided)
+**Instantiated as:** [`P-EXP-01#1`](../decisions/P-EXP.md#p-exp-011----where-is-the-file-generated) (decided)
 
 ---
 
@@ -43,9 +43,9 @@ record of what was chosen -- for that see
 - **Hybrid approach**
   Synchronous generation for small or filtered datasets, automatically switching to asynchronous background jobs when record counts exceed a specific threshold.
 
-**Raises:** P-EVT-01
+**Raises:** [`P-EVT-01`](../guidance/P-EVT.md#p-evt-01----how-are-events-delivered-inside-the-backend)
 
-**Instantiated as:** `P-EXP-02#1` (decided)
+**Instantiated as:** [`P-EXP-02#1`](../decisions/P-EXP.md#p-exp-021----synchronous-response-or-background-job) (decided)
 
 ---
 
@@ -66,9 +66,9 @@ record of what was chosen -- for that see
 - **Checkbox for user choice**
   Provides a UI modal empowering users to explicitly select their desired export scope.
 
-**Bound to:** P-ASS-03
+**Bound to:** [`P-ASS-03`](../guidance/P-ASS.md#p-ass-03----how-is-a-long-list-paginated)
 
-**Instantiated as:** `P-EXP-03#1` (decided)
+**Instantiated as:** [`P-EXP-03#1`](../decisions/P-EXP.md#p-exp-031----what-is-the-scope-of-exported-data) (decided)
 
 ---
 
@@ -85,9 +85,9 @@ record of what was chosen -- for that see
 - **Response streaming**
   Write the workbook stream chunk-by-chunk directly to the HTTP response or disk; highly memory-efficient, but requires library support for streaming writers.
 
-**Bound to:** P-EXP-03
+**Bound to:** [`P-EXP-03`](#p-exp-03----what-is-the-scope-of-exported-data)
 
-**Instantiated as:** `P-EXP-04#1` (decided)
+**Instantiated as:** [`P-EXP-04#1`](../decisions/P-EXP.md#p-exp-041----is-the-file-buffered-in-memory-or-streamed) (decided)
 
 ---
 
@@ -108,9 +108,9 @@ record of what was chosen -- for that see
 - **openpyxl (Python)**
   Simple API; means a second runtime in the deployment.
 
-**Bound to:** P-EXP-01, P-EXP-04
+**Bound to:** [`P-EXP-01`](#p-exp-01----where-is-the-file-generated), [`P-EXP-04`](#p-exp-04----is-the-file-buffered-in-memory-or-streamed)
 
 **References:** https://github.com/exceljs/exceljs
 
-**Instantiated as:** `P-EXP-05#1` (decided)
+**Instantiated as:** [`P-EXP-05#1`](../decisions/P-EXP.md#p-exp-051----which-library-generates-the-spreadsheet) (decided)
 

@@ -8,19 +8,19 @@ decision with an explicit trigger is deferred, not forgotten.
 
 | Occurrence | Problem | Status | Chosen | Level | Trigger | ADR | Sprint |
 |---|---|---|---|---|---|---|---|
-| `P-ASS-04#1` | How are concurrent edits to the same record resolved? | partially decided | Last-write-wins (LWW) *(tentative)* | Conceptual | S-01 | 0004 | 1 |
-| `P-CUS-01#1` | What is the customization model? | partially decided | Ad-hoc parameters | Conceptual | S-04 | 0011 | 2 |
-| `P-ASS-01#1` | How are entity attributes modelled when subtypes differ? | decided | Fixed relational schema | Conceptual | S-01 | 0001 | 1 |
-| `P-ASS-02#1` | What does deletion mean for this entity? | decided | Soft delete | Conceptual | S-01 | 0002 | 1 |
-| `P-ASS-03#1` | How is a long list paginated? | decided | Offset/limit | Conceptual | S-02 | 0003 | 1 |
-| `P-ASS-05#1` | Where does input validation live? | decided | DTOs in API layer | Conceptual | S-01 | 0005 | 1 |
-| `P-CUS-02#1` | Which aspects of the output are customizable? | decided | Column selection, Column order, Header labels, Date and number formatting | Conceptual | S-04 | 0012 | 2 |
-| `P-CUS-03#1` | Where are saved export profiles stored? | decided | Per-user database record | Conceptual | S-04 | 0013 | 2 |
-| `P-EXP-01#1` | Where is the file generated? | decided | Backend (server-side) | Conceptual | S-03 | 0006 | 1 |
-| `P-EXP-02#1` | Synchronous response or background job? | decided | Returned in API response body (synchronous) | Conceptual | S-03 | 0007 | 1 |
-| `P-EXP-03#1` | What is the scope of exported data? | decided | All filtered rows | Conceptual | S-03 | 0008 | 1 |
-| `P-EXP-04#1` | Is the file buffered in memory or streamed? | decided | In-memory buffer | Conceptual | S-03 | 0009 | 1 |
-| `P-EXP-05#1` | Which library generates the spreadsheet? | decided | ExcelJS (Node.js) | Vendor/Asset | S-03 | 0010 | 1 |
+| [`P-ASS-04#1`](decisions/P-ASS.md#p-ass-041----how-are-concurrent-edits-to-the-same-record-resolved) | [How are concurrent edits to the same record resolved?](guidance/P-ASS.md#p-ass-04----how-are-concurrent-edits-to-the-same-record-resolved) | partially decided | Last-write-wins (LWW) *(tentative)* | Conceptual | S-01 | [ADR-0004](../records/adr/0004-last-write-wins-lww.md) | 1 |
+| [`P-CUS-01#1`](decisions/P-CUS.md#p-cus-011----what-is-the-customization-model) | [What is the customization model?](guidance/P-CUS.md#p-cus-01----what-is-the-customization-model) | partially decided | Ad-hoc parameters | Conceptual | S-04 | [ADR-0011](../records/adr/0011-ad-hoc-parameters.md) | 2 |
+| [`P-ASS-01#1`](decisions/P-ASS.md#p-ass-011----how-are-entity-attributes-modelled-when-subtypes-differ) | [How are entity attributes modelled when subtypes differ?](guidance/P-ASS.md#p-ass-01----how-are-entity-attributes-modelled-when-subtypes-differ) | decided | Fixed relational schema | Conceptual | S-01 | [ADR-0001](../records/adr/0001-fixed-relational-schema.md) | 1 |
+| [`P-ASS-02#1`](decisions/P-ASS.md#p-ass-021----what-does-deletion-mean-for-this-entity) | [What does deletion mean for this entity?](guidance/P-ASS.md#p-ass-02----what-does-deletion-mean-for-this-entity) | decided | Soft delete | Conceptual | S-01 | [ADR-0002](../records/adr/0002-soft-delete.md) | 1 |
+| [`P-ASS-03#1`](decisions/P-ASS.md#p-ass-031----how-is-a-long-list-paginated) | [How is a long list paginated?](guidance/P-ASS.md#p-ass-03----how-is-a-long-list-paginated) | decided | Offset/limit | Conceptual | S-02 | [ADR-0003](../records/adr/0003-offset-limit.md) | 1 |
+| [`P-ASS-05#1`](decisions/P-ASS.md#p-ass-051----where-does-input-validation-live) | [Where does input validation live?](guidance/P-ASS.md#p-ass-05----where-does-input-validation-live) | decided | DTOs in API layer | Conceptual | S-01 | [ADR-0005](../records/adr/0005-dtos-in-api-layer.md) | 1 |
+| [`P-CUS-02#1`](decisions/P-CUS.md#p-cus-021----which-aspects-of-the-output-are-customizable) | [Which aspects of the output are customizable?](guidance/P-CUS.md#p-cus-02----which-aspects-of-the-output-are-customizable) | decided | Column selection, Column order, Header labels, Date and number formatting | Conceptual | S-04 | [ADR-0012](../records/adr/0012-column-selection.md) | 2 |
+| [`P-CUS-03#1`](decisions/P-CUS.md#p-cus-031----where-are-saved-export-profiles-stored) | [Where are saved export profiles stored?](guidance/P-CUS.md#p-cus-03----where-are-saved-export-profiles-stored) | decided | Per-user database record | Conceptual | S-04 | [ADR-0013](../records/adr/0013-per-user-database-record.md) | 2 |
+| [`P-EXP-01#1`](decisions/P-EXP.md#p-exp-011----where-is-the-file-generated) | [Where is the file generated?](guidance/P-EXP.md#p-exp-01----where-is-the-file-generated) | decided | Backend (server-side) | Conceptual | S-03 | [ADR-0006](../records/adr/0006-backend-server-side.md) | 1 |
+| [`P-EXP-02#1`](decisions/P-EXP.md#p-exp-021----synchronous-response-or-background-job) | [Synchronous response or background job?](guidance/P-EXP.md#p-exp-02----synchronous-response-or-background-job) | decided | Returned in API response body (synchronous) | Conceptual | S-03 | [ADR-0007](../records/adr/0007-returned-in-api-response-body-synchronous.md) | 1 |
+| [`P-EXP-03#1`](decisions/P-EXP.md#p-exp-031----what-is-the-scope-of-exported-data) | [What is the scope of exported data?](guidance/P-EXP.md#p-exp-03----what-is-the-scope-of-exported-data) | decided | All filtered rows | Conceptual | S-03 | [ADR-0008](../records/adr/0008-all-filtered-rows.md) | 1 |
+| [`P-EXP-04#1`](decisions/P-EXP.md#p-exp-041----is-the-file-buffered-in-memory-or-streamed) | [Is the file buffered in memory or streamed?](guidance/P-EXP.md#p-exp-04----is-the-file-buffered-in-memory-or-streamed) | decided | In-memory buffer | Conceptual | S-03 | [ADR-0009](../records/adr/0009-in-memory-buffer.md) | 1 |
+| [`P-EXP-05#1`](decisions/P-EXP.md#p-exp-051----which-library-generates-the-spreadsheet) | [Which library generates the spreadsheet?](guidance/P-EXP.md#p-exp-05----which-library-generates-the-spreadsheet) | decided | ExcelJS (Node.js) | Vendor/Asset | S-03 | [ADR-0010](../records/adr/0010-exceljs-node-js.md) | 1 |
 
 ## Summary
 
@@ -35,7 +35,7 @@ Records: 13 ADRs across 4 packages.
 
 ## Notes
 
-- `P-ASS-04#1` -- single-user system; revisit on a second writer
-- `P-CUS-02#1` -- a subset is chosen here, not a single option
-- `P-EXP-02#1` -- deliberately deferred; trigger is export time exceeding ~3s
-- `P-EXP-04#1` -- rests on a text-only row-size estimate
+- [`P-ASS-04#1`](decisions/P-ASS.md#p-ass-041----how-are-concurrent-edits-to-the-same-record-resolved) -- single-user system; revisit on a second writer
+- [`P-CUS-02#1`](decisions/P-CUS.md#p-cus-021----which-aspects-of-the-output-are-customizable) -- a subset is chosen here, not a single option
+- [`P-EXP-02#1`](decisions/P-EXP.md#p-exp-021----synchronous-response-or-background-job) -- deliberately deferred; trigger is export time exceeding ~3s
+- [`P-EXP-04#1`](decisions/P-EXP.md#p-exp-041----is-the-file-buffered-in-memory-or-streamed) -- rests on a text-only row-size estimate

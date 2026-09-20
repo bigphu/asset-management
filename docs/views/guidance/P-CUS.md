@@ -24,9 +24,9 @@ record of what was chosen -- for that see
 - **Hybrid approach**
   Combining reusable saved profiles with dynamic template mapping for maximum flexibility.
 
-**Raises:** P-CUS-02, P-CUS-03, P-CUS-04
+**Raises:** [`P-CUS-02`](#p-cus-02----which-aspects-of-the-output-are-customizable), [`P-CUS-03`](#p-cus-03----where-are-saved-export-profiles-stored), [`P-CUS-04`](#p-cus-04----what-happens-when-an-export-profile-references-an-attribute-that-no-longer-exists)
 
-**Instantiated as:** `P-CUS-01#1` (partially decided)
+**Instantiated as:** [`P-CUS-01#1`](../decisions/P-CUS.md#p-cus-011----what-is-the-customization-model) (partially decided)
 
 ---
 
@@ -48,7 +48,7 @@ record of what was chosen -- for that see
 - **Grouping and sort order**
 - **Column widths**
 
-**Instantiated as:** `P-CUS-02#1` (decided)
+**Instantiated as:** [`P-CUS-02#1`](../decisions/P-CUS.md#p-cus-021----which-aspects-of-the-output-are-customizable) (decided)
 
 ---
 
@@ -67,7 +67,7 @@ record of what was chosen -- for that see
 - **Importable/Exportable JSON file**
   File-based profiles managed entirely by the user locally; highly portable across environments, but requires manual file management.
 
-**Instantiated as:** `P-CUS-03#1` (decided)
+**Instantiated as:** [`P-CUS-03#1`](../decisions/P-CUS.md#p-cus-031----where-are-saved-export-profiles-stored) (decided)
 
 ---
 
@@ -86,5 +86,5 @@ record of what was chosen -- for that see
 - **Emit an empty column and warn user**
   Render an empty placeholder column in the output file alongside a warning notification in the response headers or UI.
 
-**Bound to:** P-ASS-01
+**Bound to:** [`P-ASS-01`](../guidance/P-ASS.md#p-ass-01----how-are-entity-attributes-modelled-when-subtypes-differ)
 

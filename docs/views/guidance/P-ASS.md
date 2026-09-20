@@ -24,11 +24,11 @@ record of what was chosen -- for that see
 - **Hybrid approach**
   Fixed static columns for core/queryable attributes combined with a JSON column for asset-specific attributes.
 
-**Raises:** P-EXP-03, P-CUS-04
+**Raises:** [`P-EXP-03`](../guidance/P-EXP.md#p-exp-03----what-is-the-scope-of-exported-data), [`P-CUS-04`](../guidance/P-CUS.md#p-cus-04----what-happens-when-an-export-profile-references-an-attribute-that-no-longer-exists)
 
 **References:** https://martinfowler.com/eaaCatalog/
 
-**Instantiated as:** `P-ASS-01#1` (decided)
+**Instantiated as:** [`P-ASS-01#1`](../decisions/P-ASS.md#p-ass-011----how-are-entity-attributes-modelled-when-subtypes-differ) (decided)
 
 ---
 
@@ -47,7 +47,7 @@ record of what was chosen -- for that see
 - **Active status**
   Manage lifecycle via a `status` enumeration (e.g., *active*, *retired*, *disposed*) without deleting records.
 
-**Instantiated as:** `P-ASS-02#1` (decided)
+**Instantiated as:** [`P-ASS-02#1`](../decisions/P-ASS.md#p-ass-021----what-does-deletion-mean-for-this-entity) (decided)
 
 ---
 
@@ -66,9 +66,9 @@ record of what was chosen -- for that see
 - **No pagination**
   Return full collections in a single payload; zero pagination complexity, but introduces latency and memory bottlenecks as the dataset scales.
 
-**Raises:** P-EXP-03
+**Raises:** [`P-EXP-03`](../guidance/P-EXP.md#p-exp-03----what-is-the-scope-of-exported-data)
 
-**Instantiated as:** `P-ASS-03#1` (decided)
+**Instantiated as:** [`P-ASS-03#1`](../decisions/P-ASS.md#p-ass-031----how-is-a-long-list-paginated) (decided)
 
 ---
 
@@ -87,7 +87,7 @@ record of what was chosen -- for that see
 - **Pessimistic locking**
   Lock target database rows (`SELECT FOR UPDATE`) during read-modify-write; guarantees serialization, but introduces latency and deadlock potential.
 
-**Instantiated as:** `P-ASS-04#1` (partially decided)
+**Instantiated as:** [`P-ASS-04#1`](../decisions/P-ASS.md#p-ass-041----how-are-concurrent-edits-to-the-same-record-resolved) (partially decided)
 
 ---
 
@@ -108,5 +108,5 @@ record of what was chosen -- for that see
 - **Hybrid approach**
   Sanitize and validate payload shape at DTO ingress, enforce business invariants in the domain layer, and keep database constraints as a defensive safety net.
 
-**Instantiated as:** `P-ASS-05#1` (decided)
+**Instantiated as:** [`P-ASS-05#1`](../decisions/P-ASS.md#p-ass-051----where-does-input-validation-live) (decided)
 

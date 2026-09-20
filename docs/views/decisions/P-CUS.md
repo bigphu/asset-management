@@ -14,10 +14,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | partially decided |
-| Problem | [`P-CUS-01`](../guidance/P-CUS.md) |
+| Problem | [`P-CUS-01`](../guidance/P-CUS.md#p-cus-01----what-is-the-customization-model) |
 | Trigger | S-04 |
 | Sprint | 2 |
-| ADR | ADR-0011 |
+| ADR | [ADR-0011](../../records/adr/0011-ad-hoc-parameters.md) |
 
 - [x] **Ad-hoc parameters**
 - [ ] **Saved, reusable export profiles**
@@ -31,10 +31,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-CUS-02`](../guidance/P-CUS.md) |
+| Problem | [`P-CUS-02`](../guidance/P-CUS.md#p-cus-02----which-aspects-of-the-output-are-customizable) |
 | Trigger | S-04 |
 | Sprint | 2 |
-| ADR | ADR-0012 |
+| ADR | [ADR-0012](../../records/adr/0012-column-selection.md) |
 
 - [x] **Column selection**
 - [x] **Column order**
@@ -55,10 +55,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-CUS-03`](../guidance/P-CUS.md) |
+| Problem | [`P-CUS-03`](../guidance/P-CUS.md#p-cus-03----where-are-saved-export-profiles-stored) |
 | Trigger | S-04 |
 | Sprint | 2 |
-| ADR | ADR-0013 |
+| ADR | [ADR-0013](../../records/adr/0013-per-user-database-record.md) |
 
 - [ ] ~~localStorage in user browser~~
 - [x] **Per-user database record**

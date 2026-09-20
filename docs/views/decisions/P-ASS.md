@@ -14,10 +14,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | partially decided |
-| Problem | [`P-ASS-04`](../guidance/P-ASS.md) |
+| Problem | [`P-ASS-04`](../guidance/P-ASS.md#p-ass-04----how-are-concurrent-edits-to-the-same-record-resolved) |
 | Trigger | S-01 |
 | Sprint | 1 |
-| ADR | ADR-0004 |
+| ADR | [ADR-0004](../../records/adr/0004-last-write-wins-lww.md) |
 
 - [x] **Last-write-wins (LWW)** -- _tentative_
 - [ ] **Optimistic locking**
@@ -32,10 +32,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-ASS-01`](../guidance/P-ASS.md) |
+| Problem | [`P-ASS-01`](../guidance/P-ASS.md#p-ass-01----how-are-entity-attributes-modelled-when-subtypes-differ) |
 | Trigger | S-01 |
 | Sprint | 1 |
-| ADR | ADR-0001 |
+| ADR | [ADR-0001](../../records/adr/0001-fixed-relational-schema.md) |
 
 - [x] **Fixed relational schema**
 - [ ] ~~Entity-Attribute-Value (EAV) model~~
@@ -49,10 +49,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-ASS-02`](../guidance/P-ASS.md) |
+| Problem | [`P-ASS-02`](../guidance/P-ASS.md#p-ass-02----what-does-deletion-mean-for-this-entity) |
 | Trigger | S-01 |
 | Sprint | 1 |
-| ADR | ADR-0002 |
+| ADR | [ADR-0002](../../records/adr/0002-soft-delete.md) |
 
 - [ ] ~~Hard delete~~
 - [x] **Soft delete**
@@ -65,10 +65,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-ASS-03`](../guidance/P-ASS.md) |
+| Problem | [`P-ASS-03`](../guidance/P-ASS.md#p-ass-03----how-is-a-long-list-paginated) |
 | Trigger | S-02 |
 | Sprint | 1 |
-| ADR | ADR-0003 |
+| ADR | [ADR-0003](../../records/adr/0003-offset-limit.md) |
 
 - [x] **Offset/limit**
 - [ ] ~~Cursor-based~~
@@ -81,10 +81,10 @@ What this project decided, and what it ruled out. Edit the records under
 | | |
 |---|---|
 | Status | decided |
-| Problem | [`P-ASS-05`](../guidance/P-ASS.md) |
+| Problem | [`P-ASS-05`](../guidance/P-ASS.md#p-ass-05----where-does-input-validation-live) |
 | Trigger | S-01 |
 | Sprint | 1 |
-| ADR | ADR-0005 |
+| ADR | [ADR-0005](../../records/adr/0005-dtos-in-api-layer.md) |
 
 - [x] **DTOs in API layer**
 - [ ] ~~Domain layer~~

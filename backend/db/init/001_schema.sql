@@ -1,278 +1,437 @@
--- SQL dump generated using DBML (dbml.dbdiagram.io)
--- Database: PostgreSQL
--- Generated at: 2026-09-20T07:26:14.529Z
+-- PostgreSQL 16 bootstrap derived from core-asset-management.dbml.
+-- PostgreSQL-specific integrity guards are defined here explicitly:
+-- citext, named checks, partial unique indexes and immutable/append-only triggers.
+-- Scope: small core asset management only; no maintenance, warranty, full RBAC,
+-- sessions, password-reset tokens, documents, notifications or work queues.
 
-CREATE TYPE "account_status" AS ENUM (
-  'active',
-  'temporarily_locked',
-  'disabled',
-  'password_reset_required'
+CREATE EXTENSION IF NOT EXISTS citext;
+
+CREATE TYPE fw_user_role AS ENUM (
+  'admin',
+  'asset_manager',
+  'viewer'
 );
 
-CREATE TYPE "asset_lifecycle_status" AS ENUM (
-  'draft',
-  'active',
-  'retired',
-  'disposed'
+CREATE TYPE asset_event_type AS ENUM (
+  'created',
+  'updated',
+  'archived',
+  'restored',
+  'loaned',
+  'returned'
 );
 
-CREATE TABLE "fw_users" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "email" varchar(320) UNIQUE NOT NULL,
-  "display_name" varchar(255) NOT NULL,
-  "status" account_status NOT NULL DEFAULT 'active',
-  "password_hash" varchar(512) NOT NULL,
-  "password_changed_at" timestamptz NOT NULL DEFAULT (now()),
-  "token_version" integer NOT NULL DEFAULT 1,
-  "failed_login_count" integer NOT NULL DEFAULT 0,
-  "locked_until" timestamptz,
-  "last_login_at" timestamptz,
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "updated_at" timestamptz NOT NULL DEFAULT (now())
+CREATE TYPE export_date_format AS ENUM (
+  'iso',
+  'day_month_year',
+  'month_day_year'
 );
 
-CREATE TABLE "fw_roles" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "user_id" uuid NOT NULL,
-  "description" varchar(255),
-  "permissions" text[] NOT NULL,
-  "is_active" boolean NOT NULL DEFAULT true,
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "updated_at" timestamptz NOT NULL DEFAULT (now())
+CREATE TABLE fw_users (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email citext NOT NULL UNIQUE,
+  password_hash varchar(512) NOT NULL,
+  display_name varchar(255) NOT NULL,
+  role fw_user_role NOT NULL DEFAULT 'viewer',
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT ck_fw_users_email_nonblank
+    CHECK (btrim(email::text) <> ''),
+  CONSTRAINT ck_fw_users_password_hash_nonblank
+    CHECK (btrim(password_hash) <> ''),
+  CONSTRAINT ck_fw_users_display_name_nonblank
+    CHECK (btrim(display_name) <> '')
 );
 
-CREATE TABLE "locations" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "code" varchar(32) UNIQUE NOT NULL,
-  "name" varchar(255) NOT NULL,
-  "is_active" boolean NOT NULL DEFAULT true,
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "updated_at" timestamptz NOT NULL DEFAULT (now())
+CREATE TABLE asset_types (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code varchar(32) NOT NULL UNIQUE,
+  name varchar(255) NOT NULL,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT ck_asset_types_code_canonical
+    CHECK (code = upper(btrim(code)) AND code ~ '^[A-Z0-9_-]+$'),
+  CONSTRAINT ck_asset_types_name_nonblank
+    CHECK (btrim(name) <> '')
 );
 
-CREATE TABLE "asset_categories" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "code" varchar(32) UNIQUE NOT NULL,
-  "name" varchar(255) NOT NULL,
-  "is_active" boolean NOT NULL DEFAULT true,
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "updated_at" timestamptz NOT NULL DEFAULT (now())
+CREATE TABLE asset_statuses (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code varchar(32) NOT NULL UNIQUE,
+  name varchar(255) NOT NULL,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT ck_asset_statuses_code_canonical
+    CHECK (code = upper(btrim(code)) AND code ~ '^[A-Z0-9_-]+$'),
+  CONSTRAINT ck_asset_statuses_name_nonblank
+    CHECK (btrim(name) <> '')
 );
 
-CREATE TABLE "assets" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "asset_tag" varchar(64) UNIQUE NOT NULL,
-  "name" varchar(255) NOT NULL,
-  "category_id" uuid NOT NULL,
-  "lifecycle_status" asset_lifecycle_status NOT NULL DEFAULT 'active',
-  "purchase_date" date,
-  "location_id" uuid,
-  "notes" text,
-  "deleted_at" timestamptz,
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_by_user_id" uuid,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "updated_by_user_id" uuid
+CREATE TABLE locations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code varchar(32) NOT NULL UNIQUE,
+  name varchar(255) NOT NULL,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT ck_locations_code_canonical
+    CHECK (code = upper(btrim(code)) AND code ~ '^[A-Z0-9_-]+$'),
+  CONSTRAINT ck_locations_name_nonblank
+    CHECK (btrim(name) <> '')
 );
 
-CREATE TABLE "asset_loans" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "asset_id" uuid NOT NULL,
-  "borrower_name" varchar(255) NOT NULL,
-  "borrowed_at" timestamptz NOT NULL DEFAULT (now()),
-  "due_at" timestamptz,
-  "returned_at" timestamptz,
-  "note" text,
-  "created_by_user_id" uuid NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "updated_at" timestamptz NOT NULL DEFAULT (now())
+CREATE TABLE assets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  asset_tag citext NOT NULL UNIQUE,
+  name varchar(255) NOT NULL,
+  asset_type_id uuid NOT NULL,
+  asset_status_id uuid NOT NULL,
+  purchase_date date NOT NULL,
+  location_id uuid NOT NULL,
+  notes text,
+  deleted_at timestamptz,
+  created_by_user_id uuid NOT NULL,
+  updated_by_user_id uuid NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT ck_assets_asset_tag_nonblank
+    CHECK (btrim(asset_tag::text) <> ''),
+  CONSTRAINT ck_assets_name_nonblank
+    CHECK (btrim(name) <> ''),
+  CONSTRAINT ck_assets_notes_nonblank
+    CHECK (notes IS NULL OR btrim(notes) <> ''),
+  CONSTRAINT ck_assets_deleted_after_created
+    CHECK (deleted_at IS NULL OR deleted_at >= created_at)
 );
 
-CREATE TABLE "asset_events" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "asset_id" uuid NOT NULL,
-  "event_type" varchar(32) NOT NULL,
-  "occurred_at" timestamptz NOT NULL DEFAULT (now()),
-  "actor_user_id" uuid,
-  "description" text NOT NULL,
-  "details" jsonb
+CREATE TABLE asset_loans (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  asset_id uuid NOT NULL,
+  borrower_name varchar(255) NOT NULL,
+  borrowed_at timestamptz NOT NULL DEFAULT now(),
+  due_at timestamptz,
+  returned_at timestamptz,
+  note text,
+  created_by_user_id uuid NOT NULL,
+  returned_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT ck_asset_loans_borrower_nonblank
+    CHECK (btrim(borrower_name) <> ''),
+  CONSTRAINT ck_asset_loans_due_after_borrowed
+    CHECK (due_at IS NULL OR due_at >= borrowed_at),
+  CONSTRAINT ck_asset_loans_returned_after_borrowed
+    CHECK (returned_at IS NULL OR returned_at >= borrowed_at),
+  CONSTRAINT ck_asset_loans_return_actor_pair
+    CHECK ((returned_at IS NULL) = (returned_by_user_id IS NULL)),
+  CONSTRAINT ck_asset_loans_note_nonblank
+    CHECK (note IS NULL OR btrim(note) <> '')
 );
 
-CREATE TABLE "export_profiles" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "owner_user_id" uuid NOT NULL,
-  "name" varchar(100) NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "deleted_at" timestamptz
+CREATE TABLE asset_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  asset_id uuid NOT NULL,
+  event_type asset_event_type NOT NULL,
+  occurred_at timestamptz NOT NULL DEFAULT now(),
+  actor_user_id uuid,
+  description text NOT NULL,
+  details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  CONSTRAINT ck_asset_events_description_nonblank
+    CHECK (btrim(description) <> ''),
+  CONSTRAINT ck_asset_events_details_object
+    CHECK (jsonb_typeof(details) = 'object')
 );
 
-CREATE TABLE "export_profile_columns" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "profile_id" uuid NOT NULL,
-  "field_key" varchar(64) NOT NULL,
-  "ordinal" integer NOT NULL,
-  "header_label" varchar(255),
-  "date_format" varchar(64),
-  "number_format" varchar(64)
+CREATE TABLE export_profiles (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_user_id uuid NOT NULL,
+  name citext NOT NULL,
+  date_format export_date_format NOT NULL DEFAULT 'iso',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT ck_export_profiles_name_nonblank
+    CHECK (btrim(name::text) <> ''),
+  CONSTRAINT uq_export_profiles_owner_name UNIQUE (owner_user_id, name)
 );
 
-CREATE INDEX ON "fw_users" ("status");
-
-CREATE INDEX ON "fw_roles" ("user_id");
-
-CREATE INDEX ON "fw_roles" ("user_id", "is_active");
-
-CREATE INDEX ON "locations" ("is_active");
-
-CREATE INDEX ON "locations" ("name");
-
-CREATE INDEX ON "asset_categories" ("is_active");
-
-CREATE INDEX ON "asset_categories" ("name");
-
-CREATE INDEX ON "assets" ("lifecycle_status");
-
-CREATE INDEX ON "assets" ("category_id");
-
-CREATE INDEX ON "assets" ("location_id");
-
-CREATE INDEX ON "assets" ("purchase_date");
-
-CREATE INDEX ON "assets" ("deleted_at");
-
-CREATE INDEX ON "assets" ("name");
-
-CREATE INDEX ON "asset_loans" ("asset_id");
-
-CREATE INDEX ON "asset_loans" ("returned_at");
-
-CREATE INDEX ON "asset_loans" ("due_at");
-
-CREATE INDEX ON "asset_loans" ("asset_id", "returned_at");
-
-CREATE INDEX ON "asset_events" ("asset_id", "occurred_at");
-
-CREATE INDEX ON "asset_events" ("event_type");
-
-CREATE INDEX ON "asset_events" ("actor_user_id");
-
-CREATE UNIQUE INDEX ON "export_profiles" ("owner_user_id", "name");
-
-CREATE INDEX ON "export_profiles" ("owner_user_id");
-
-CREATE UNIQUE INDEX ON "export_profile_columns" ("profile_id", "ordinal");
-
-CREATE INDEX ON "export_profile_columns" ("field_key");
-
-COMMENT ON TABLE "fw_users" IS 'Không public self-registration. Admin tạo account với mật khẩu tạm và
-status password_reset_required; user bắt buộc đổi ở lần login đầu.
-JWT stateless: mọi request kiểm tra token_version; đổi password/disable
-tăng token_version nên token cũ hết hiệu lực (thay cho session store).
-Disable account giữ nguyên lịch sử thao tác (không xóa user).
-Admin không đọc được password; role nằm ở fw_roles.
-';
-
-COMMENT ON COLUMN "fw_users"."email" IS 'Sign-in identifier. Case-insensitive cần citext hoặc unique index lower(email).';
-
-COMMENT ON COLUMN "fw_users"."password_hash" IS 'Salted adaptive one-way hash. Không bao giờ plaintext, không log.';
-
-COMMENT ON COLUMN "fw_users"."token_version" IS 'Nhúng vào JWT claim. Tăng khi đổi password, disable account hoặc đổi role → token cũ bị vô hiệu.';
-
-COMMENT ON COLUMN "fw_users"."locked_until" IS 'Temporary lock; threshold/duration là câu hỏi mở.';
-
-COMMENT ON TABLE "fw_roles" IS 'RBAC đơn giản: role gắn trực tiếp per-user, permission là array.
-Không có bảng permissions/role_permissions/user_roles, không có scope.
-Effective permissions = union array của các row is_active = true.
-Permission code hợp lệ kiểm tra ở app (constant list).
-Default templates (System Administrator, Asset Manager, Read-only Reporter)
-là hằng số trong code khi tạo row, không phải bảng.
-';
-
-COMMENT ON COLUMN "fw_roles"."user_id" IS 'Role gán trực tiếp cho user; một user có thể có nhiều row.';
-
-COMMENT ON COLUMN "fw_roles"."permissions" IS 'Array permission code, ví dụ {assets.view, assets.create, exports.run}.';
-
-COMMENT ON TABLE "locations" IS 'Reference data: đã dùng thì deactivate (is_active = false), không xóa, để filter/report/history giữ nguyên nghĩa.';
-
-COMMENT ON TABLE "asset_categories" IS 'Thay cho assets.type text. Category-specific attributes vẫn là mở rộng sau.';
-
-COMMENT ON TABLE "assets" IS 'Sáu field S-01: asset_tag, name, category (type), status (→ lifecycle_status),
-purchase_date, location.
-Tag không sửa được để bảo đảm no-reuse; nếu sau này cần đổi tag thì thêm
-bảng tag history/registry.
-Soft delete (ADR-0002): không hard-delete, không giải phóng tag; mọi read
-path (list, export, duplicate-tag check) phải lọc deleted_at IS NULL.
-Concurrency (ADR-0004 tentative): LWW, không có cột version.
-Search tag/name dùng pg_trgm GIN (DBML không biểu diễn).
-';
-
-COMMENT ON COLUMN "assets"."asset_tag" IS 'Immutable sau khi tạo → không tái sử dụng tag, kể cả sau soft delete.';
-
-COMMENT ON COLUMN "assets"."category_id" IS 'FK asset_categories; thay cho type text.';
-
-COMMENT ON COLUMN "assets"."lifecycle_status" IS 'Vocabulary Gate 1. condition/availability tách riêng sẽ thêm khi mở rộng.';
-
-COMMENT ON COLUMN "assets"."purchase_date" IS 'Date-only, không timezone. Nullable.';
-
-COMMENT ON COLUMN "assets"."location_id" IS 'FK locations; thay cho location text.';
-
-COMMENT ON COLUMN "assets"."deleted_at" IS 'Soft delete theo ADR-0002: NULL = active; list/export lọc deleted_at IS NULL. Restore = set NULL.';
-
-COMMENT ON TABLE "asset_loans" IS 'Mượn/trả đơn giản: mỗi row là một lần cho mượn.
-Đang mượn = returned_at IS NULL. Overdue = due_at < now() AND returned_at IS NULL.
-Một asset tối đa một row đang mượn: partial unique (asset_id)
-WHERE returned_at IS NULL — DBML không biểu diễn được.
-';
-
-COMMENT ON COLUMN "asset_loans"."borrower_name" IS 'Người mượn; có thể không có user account.';
-
-COMMENT ON COLUMN "asset_loans"."due_at" IS 'Hạn trả dự kiến; null nếu không hẹn.';
-
-COMMENT ON COLUMN "asset_loans"."returned_at" IS 'NULL = đang mượn.';
-
-COMMENT ON COLUMN "asset_loans"."created_by_user_id" IS 'User ghi nhận giao dịch.';
-
-COMMENT ON TABLE "asset_events" IS 'Lịch sử/audit của asset, append-only (không UPDATE/DELETE).
-Không audit authentication/RBAC.
-';
-
-COMMENT ON COLUMN "asset_events"."event_type" IS 'created | updated | borrowed | returned | deleted | restored';
-
-COMMENT ON COLUMN "asset_events"."actor_user_id" IS 'Ai thực hiện; null cho system.';
-
-COMMENT ON COLUMN "asset_events"."description" IS 'Mô tả ngắn; mốc thời gian và người liên quan nằm ở cột riêng, không nhét vào đây.';
-
-COMMENT ON COLUMN "asset_events"."details" IS 'Dữ liệu có cấu trúc: before/after khi updated, loan_id khi borrowed/returned.';
-
-COMMENT ON TABLE "export_profiles" IS 'Private theo user, không share. One-time override khi export không tự update profile trừ khi user save. Profile không mở rộng quyền xem dữ liệu.';
-
-COMMENT ON COLUMN "export_profiles"."deleted_at" IS 'Private config; hard delete cũng chấp nhận được.';
-
-COMMENT ON COLUMN "export_profile_columns"."field_key" IS 'asset_tag | name | category | lifecycle_status | purchase_date | location; validate ở app.';
-
-COMMENT ON COLUMN "export_profile_columns"."header_label" IS 'Null = dùng label mặc định.';
-
-COMMENT ON COLUMN "export_profile_columns"."number_format" IS 'Number formatting cần xác nhận có thuộc MVP không.';
-
-ALTER TABLE "fw_roles" ADD FOREIGN KEY ("user_id") REFERENCES "fw_users" ("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "assets" ADD FOREIGN KEY ("category_id") REFERENCES "asset_categories" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "assets" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "assets" ADD FOREIGN KEY ("created_by_user_id") REFERENCES "fw_users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "assets" ADD FOREIGN KEY ("updated_by_user_id") REFERENCES "fw_users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "asset_loans" ADD FOREIGN KEY ("asset_id") REFERENCES "assets" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "asset_loans" ADD FOREIGN KEY ("created_by_user_id") REFERENCES "fw_users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "asset_events" ADD FOREIGN KEY ("asset_id") REFERENCES "assets" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "asset_events" ADD FOREIGN KEY ("actor_user_id") REFERENCES "fw_users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "export_profiles" ADD FOREIGN KEY ("owner_user_id") REFERENCES "fw_users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "export_profile_columns" ADD FOREIGN KEY ("profile_id") REFERENCES "export_profiles" ("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE TABLE export_profile_columns (
+  profile_id uuid NOT NULL,
+  field_key varchar(32) NOT NULL,
+  ordinal smallint NOT NULL,
+  header_label varchar(255),
+  PRIMARY KEY (profile_id, field_key),
+  CONSTRAINT uq_export_profile_columns_ordinal
+    UNIQUE (profile_id, ordinal),
+  CONSTRAINT ck_export_profile_columns_field_key
+    CHECK (field_key IN (
+      'asset_tag',
+      'name',
+      'asset_type',
+      'asset_status',
+      'purchase_date',
+      'location'
+    )),
+  CONSTRAINT ck_export_profile_columns_ordinal
+    CHECK (ordinal BETWEEN 1 AND 6),
+  CONSTRAINT ck_export_profile_columns_header_nonblank
+    CHECK (header_label IS NULL OR btrim(header_label) <> '')
+);
+
+ALTER TABLE assets
+  ADD CONSTRAINT fk_assets_type
+    FOREIGN KEY (asset_type_id) REFERENCES asset_types(id) ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_assets_status
+    FOREIGN KEY (asset_status_id) REFERENCES asset_statuses(id) ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_assets_location
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_assets_created_by
+    FOREIGN KEY (created_by_user_id) REFERENCES fw_users(id) ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_assets_updated_by
+    FOREIGN KEY (updated_by_user_id) REFERENCES fw_users(id) ON DELETE RESTRICT;
+
+ALTER TABLE asset_loans
+  ADD CONSTRAINT fk_asset_loans_asset
+    FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_asset_loans_created_by
+    FOREIGN KEY (created_by_user_id) REFERENCES fw_users(id) ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_asset_loans_returned_by
+    FOREIGN KEY (returned_by_user_id) REFERENCES fw_users(id) ON DELETE RESTRICT;
+
+ALTER TABLE asset_events
+  ADD CONSTRAINT fk_asset_events_asset
+    FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_asset_events_actor
+    FOREIGN KEY (actor_user_id) REFERENCES fw_users(id) ON DELETE RESTRICT;
+
+ALTER TABLE export_profiles
+  ADD CONSTRAINT fk_export_profiles_owner
+    FOREIGN KEY (owner_user_id) REFERENCES fw_users(id) ON DELETE RESTRICT;
+
+ALTER TABLE export_profile_columns
+  ADD CONSTRAINT fk_export_profile_columns_profile
+    FOREIGN KEY (profile_id) REFERENCES export_profiles(id) ON DELETE CASCADE;
+
+CREATE INDEX idx_assets_active_filters
+  ON assets (asset_type_id, asset_status_id, location_id)
+  WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_assets_active_status
+  ON assets (asset_status_id)
+  WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_assets_active_location
+  ON assets (location_id)
+  WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_assets_active_name
+  ON assets (name)
+  WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_assets_purchase_date
+  ON assets (purchase_date)
+  WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uq_asset_loans_one_open_per_asset
+  ON asset_loans (asset_id)
+  WHERE returned_at IS NULL;
+
+CREATE INDEX idx_asset_loans_history
+  ON asset_loans (asset_id, borrowed_at DESC);
+
+CREATE INDEX idx_asset_loans_open_due
+  ON asset_loans (due_at)
+  WHERE returned_at IS NULL;
+
+CREATE INDEX idx_asset_events_timeline
+  ON asset_events (asset_id, occurred_at DESC, id);
+
+CREATE INDEX idx_asset_events_type
+  ON asset_events (event_type);
+
+CREATE INDEX idx_asset_events_actor
+  ON asset_events (actor_user_id);
+
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER fw_users_set_updated_at
+BEFORE UPDATE ON fw_users
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER asset_types_set_updated_at
+BEFORE UPDATE ON asset_types
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER asset_statuses_set_updated_at
+BEFORE UPDATE ON asset_statuses
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER locations_set_updated_at
+BEFORE UPDATE ON locations
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER assets_set_updated_at
+BEFORE UPDATE ON assets
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER asset_loans_set_updated_at
+BEFORE UPDATE ON asset_loans
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER export_profiles_set_updated_at
+BEFORE UPDATE ON export_profiles
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE OR REPLACE FUNCTION reject_asset_tag_change()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.asset_tag IS DISTINCT FROM OLD.asset_tag THEN
+    RAISE EXCEPTION 'asset_tag is immutable; use an audited correction workflow'
+      USING ERRCODE = '23000';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER assets_asset_tag_immutable
+BEFORE UPDATE OF asset_tag ON assets
+FOR EACH ROW EXECUTE FUNCTION reject_asset_tag_change();
+
+CREATE OR REPLACE FUNCTION reject_asset_hard_delete()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RAISE EXCEPTION 'assets cannot be hard-deleted; set deleted_at instead'
+    USING ERRCODE = '23000';
+END;
+$$;
+
+CREATE TRIGGER assets_no_hard_delete
+BEFORE DELETE ON assets
+FOR EACH ROW EXECUTE FUNCTION reject_asset_hard_delete();
+
+CREATE OR REPLACE FUNCTION reject_asset_event_mutation()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RAISE EXCEPTION 'asset_events are append-only'
+    USING ERRCODE = '23000';
+END;
+$$;
+
+CREATE TRIGGER asset_events_append_only
+BEFORE UPDATE OR DELETE ON asset_events
+FOR EACH ROW EXECUTE FUNCTION reject_asset_event_mutation();
+
+CREATE OR REPLACE FUNCTION touch_export_profile()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    UPDATE export_profiles SET updated_at = now() WHERE id = OLD.profile_id;
+    RETURN OLD;
+  ELSIF TG_OP = 'UPDATE' THEN
+    UPDATE export_profiles SET updated_at = now()
+      WHERE id IN (OLD.profile_id, NEW.profile_id);
+    RETURN NEW;
+  ELSE
+    UPDATE export_profiles SET updated_at = now() WHERE id = NEW.profile_id;
+    RETURN NEW;
+  END IF;
+END;
+$$;
+
+CREATE TRIGGER export_profile_columns_touch_parent
+AFTER INSERT OR UPDATE OR DELETE ON export_profile_columns
+FOR EACH ROW EXECUTE FUNCTION touch_export_profile();
+
+CREATE OR REPLACE FUNCTION validate_export_profile_columns()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  profile_id_to_check uuid;
+  column_count integer;
+  maximum_ordinal integer;
+BEGIN
+  profile_id_to_check := COALESCE(NEW.profile_id, OLD.profile_id);
+
+  IF NOT EXISTS (
+    SELECT 1 FROM export_profiles WHERE id = profile_id_to_check
+  ) THEN
+    RETURN NULL;
+  END IF;
+
+  SELECT count(*)::integer, COALESCE(max(ordinal), 0)::integer
+    INTO column_count, maximum_ordinal
+    FROM export_profile_columns
+   WHERE profile_id = profile_id_to_check;
+
+  IF column_count < 1 OR maximum_ordinal <> column_count THEN
+    RAISE EXCEPTION 'export profile % must have contiguous columns starting at ordinal 1', profile_id_to_check
+      USING ERRCODE = '23514';
+  END IF;
+
+  RETURN NULL;
+END;
+$$;
+
+CREATE CONSTRAINT TRIGGER export_profile_columns_contiguous
+AFTER INSERT OR UPDATE OR DELETE ON export_profile_columns
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW EXECUTE FUNCTION validate_export_profile_columns();
+
+CREATE OR REPLACE FUNCTION validate_export_profile_has_columns()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  column_count integer;
+  maximum_ordinal integer;
+BEGIN
+  SELECT count(*)::integer, COALESCE(max(ordinal), 0)::integer
+    INTO column_count, maximum_ordinal
+    FROM export_profile_columns
+   WHERE profile_id = NEW.id;
+
+  IF column_count < 1 OR maximum_ordinal <> column_count THEN
+    RAISE EXCEPTION 'export profile % must have contiguous columns starting at ordinal 1', NEW.id
+      USING ERRCODE = '23514';
+  END IF;
+
+  RETURN NULL;
+END;
+$$;
+
+CREATE CONSTRAINT TRIGGER export_profiles_require_columns
+AFTER INSERT OR UPDATE ON export_profiles
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW EXECUTE FUNCTION validate_export_profile_has_columns();
+
+COMMENT ON TABLE fw_users IS
+  'Minimal local authentication. No full RBAC, sessions, password reset tokens or MFA.';
+COMMENT ON TABLE assets IS
+  'Core asset register. Soft delete via deleted_at; asset_tag is case-insensitive, immutable and never reused.';
+COMMENT ON TABLE asset_loans IS
+  'Simple loan history. Partial unique index permits at most one open loan per asset.';
+COMMENT ON TABLE asset_events IS
+  'Append-only asset timeline; not a security audit log.';
+COMMENT ON TABLE export_profiles IS
+  'Private per-user export configuration; hard delete permits name reuse.';
+COMMENT ON TABLE export_profile_columns IS
+  'Ordered export fields; profile must contain contiguous ordinals 1..N.';

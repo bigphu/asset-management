@@ -1,12 +1,24 @@
--- Seed reference data tối thiểu để test filter/export.
--- Chạy tự động một lần khi container Postgres khởi tạo volume lần đầu.
+-- Idempotent reference data for the small core asset-management database.
+-- No users, passwords, assets, loans, events or export profiles are seeded.
+
+INSERT INTO asset_types (code, name) VALUES
+  ('LAPTOP', 'Máy tính xách tay'),
+  ('DESKTOP', 'Máy tính để bàn'),
+  ('MONITOR', 'Màn hình'),
+  ('PRINTER', 'Máy in'),
+  ('NETWORK_DEVICE', 'Thiết bị mạng'),
+  ('MOBILE_DEVICE', 'Thiết bị di động')
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO asset_statuses (code, name) VALUES
+  ('AVAILABLE', 'Sẵn sàng'),
+  ('ON_LOAN', 'Đang cho mượn'),
+  ('RETIRED', 'Ngừng sử dụng')
+ON CONFLICT (code) DO NOTHING;
 
 INSERT INTO locations (code, name) VALUES
+  ('UNKNOWN', 'Chưa xác định'),
   ('HQ', 'Trụ sở chính'),
-  ('KHO-A', 'Kho A'),
-  ('VP-2', 'Văn phòng 2');
-
-INSERT INTO asset_categories (code, name) VALUES
-  ('LAPTOP', 'Máy tính xách tay'),
-  ('MONITOR', 'Màn hình'),
-  ('PRINTER', 'Máy in');
+  ('WAREHOUSE', 'Kho'),
+  ('OFFICE', 'Văn phòng')
+ON CONFLICT (code) DO NOTHING;

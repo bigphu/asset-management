@@ -1,0 +1,26 @@
+.scopeNote {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+  border-radius: var(--radius-md);
+  padding: 11px 13px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-text-faint);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.saveRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+.saveRow > :first-child {
+  flex: 1;
+}

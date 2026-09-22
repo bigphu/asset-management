@@ -50,3 +50,11 @@ go.sum
 /records
 /records.exe
 /templates
+.claude
+
+# Local tooling / personal docs
+/opencode.json
+/.mcp.json
+/CLAUDE.md
+/docs/asset-management-system.md
+/docs/database/

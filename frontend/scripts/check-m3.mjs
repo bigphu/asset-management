@@ -57,6 +57,16 @@ export const RULES = [
       [/opacity:\s*0\.5/, 'disabled must use 0.38 content / 0.12 container, not 0.5'],
     ],
   },
+  {
+    file: 'components/ui/IconButton/IconButton.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'width: 40px',
+      'height: 40px',
+      'var(--md-shape-full)',
+      'var(--md-on-surface-variant)',
+    ],
+  },
 ]
 
 let totalFailures = 0

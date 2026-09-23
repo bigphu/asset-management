@@ -1,33 +1,38 @@
 .pagination {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
 }
 
+/* M3 icon-button sizing so page controls match the rest of the toolbar. */
 .pageBtn {
-  min-width: 28px;
-  height: 28px;
+  composes: stateLayer from '../../../styles/state-layer.module.css';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
   padding: 0 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
+  border: none;
+  border-radius: var(--md-shape-full);
   background: transparent;
-  color: var(--color-text-muted);
-  font-size: 12.5px;
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-label-lg-size);
+  line-height: var(--md-label-lg-line);
+  letter-spacing: var(--md-label-lg-tracking);
+  font-weight: var(--md-label-lg-weight);
 }
-.pageBtn:hover:not(:disabled) {
-  background: var(--color-surface);
-  border-color: var(--color-border);
-}
+
 .active {
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
-  font-weight: 600;
+  background: var(--md-primary);
+  color: var(--md-on-primary);
 }
+
 .pageBtn:disabled {
-  opacity: 0.3;
   cursor: default;
+  color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-content) * 100%), transparent);
 }

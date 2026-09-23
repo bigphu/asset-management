@@ -135,6 +135,16 @@ export const RULES = [
       'var(--md-inverse-surface)',
     ],
   },
+  {
+    file: 'components/ui/Pagination/Pagination.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'var(--md-shape-full)',
+      'var(--md-label-lg-size)',
+      'var(--md-state-disabled-content)',
+    ],
+    forbids: [[/opacity:\s*0\.3/, 'disabled must use 0.38 content, not 0.3']],
+  },
 ]
 
 let totalFailures = 0

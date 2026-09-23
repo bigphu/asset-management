@@ -9,6 +9,10 @@
   --color-surface: #ffffff;
   --color-border: #e5e7eb;
   --color-border-strong: #d1d5db;
+  /* Control boundaries (text fields, outlined buttons). WCAG SC 1.4.11 wants
+     3:1 against the adjacent surface; --color-border-strong is 1.47:1 and is
+     kept only for decorative dividers. */
+  --color-border-outline: #8a9099;
   --color-text: #111827;
   --color-text-muted: #6b7280;
   --color-text-faint: #9ca3af;
@@ -168,7 +172,7 @@
   --md-surface-container: var(--color-status-neutral-bg);
   --md-on-surface: var(--color-text);
   --md-on-surface-variant: var(--color-text-muted);
-  --md-outline: var(--color-border-strong);
+  --md-outline: var(--color-border-outline);
   --md-outline-variant: var(--color-border);
   --md-error: var(--color-status-critical-text);
   --md-error-container: var(--color-status-critical-bg);

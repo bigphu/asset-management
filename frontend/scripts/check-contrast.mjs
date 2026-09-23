@@ -5,12 +5,31 @@ import { dirname, join } from 'node:path'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const css = readFileSync(join(here, '../src/styles/tokens.css'), 'utf8')
-const tokens = Object.fromEntries(
+const literals = Object.fromEntries(
   [...css.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})/g)].map((m) => [m[1], m[2]]),
 )
-const t = (n) => {
-  if (!tokens[n]) throw new Error(`missing token --${n}`)
-  return tokens[n]
+// Role tokens are aliases (--md-primary: var(--color-accent)), so resolve the
+// chain — otherwise this gate can only see the palette, never the roles that
+// components actually reference.
+const aliases = Object.fromEntries(
+  [...css.matchAll(/--([a-z0-9-]+):\s*var\(--([a-z0-9-]+)\)/g)].map((m) => [m[1], m[2]]),
+)
+const t = (n, depth = 0) => {
+  if (literals[n]) return literals[n]
+  if (aliases[n] && depth < 10) return t(aliases[n], depth + 1)
+  throw new Error(`cannot resolve --${n} to a color`)
+}
+const opacity = (n) => {
+  const m = css.split(String.fromCharCode(10)).find((row) => row.trim().startsWith('--' + n + ':'))
+  if (!m) throw new Error(`missing opacity token --${n}`)
+  return parseFloat(m.split(':')[1])
+}
+// Flatten fg at `a` opacity over bg, the way a state layer or a
+// color-mix(..., transparent) disabled fill actually renders.
+const over = (fg, bg, a) => {
+  const px = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+  const [f, b] = [px(fg), px(bg)]
+  return '#' + f.map((c, i) => Math.round(c * a + b[i] * (1 - a)).toString(16).padStart(2, '0')).join('')
 }
 const lin = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 }
 const L = (h) => {
@@ -40,12 +59,50 @@ const CHECKS = [
   ['muted text on surface', 'color-text-muted', 'color-surface', 4.5],
 ]
 
+// Role-level pairings: the names components actually reference.
+const ROLE_CHECKS = [
+  ['on-primary on primary', 'md-on-primary', 'md-primary', 4.5],
+  ['on-surface on surface', 'md-on-surface', 'md-surface', 4.5],
+  ['on-surface-variant on surface', 'md-on-surface-variant', 'md-surface', 4.5],
+  ['on-surface on surface-container', 'md-on-surface', 'md-surface-container', 4.5],
+  ['error on surface', 'md-error', 'md-surface', 4.5],
+  ['inverse-on-surface on inverse-surface', 'md-inverse-on-surface', 'md-inverse-surface', 4.5],
+  ['inverse-primary on inverse-surface', 'md-inverse-primary', 'md-inverse-surface', 3.0],
+  ['outline on surface', 'md-outline', 'md-surface', 3.0],
+]
+
+// Composite states. These are NOT WCAG text gates: disabled controls are exempt
+// from SC 1.4.11, and a hover layer only has to be perceptible. The floors catch
+// a future palette change that makes a state vanish altogether.
+function compositeChecks() {
+  const surface = t('md-surface')
+  const onSurface = t('md-on-surface')
+  const disabledContainer = over(onSurface, surface, opacity('md-state-disabled-container'))
+  const disabledLabel = over(onSurface, disabledContainer, opacity('md-state-disabled-content'))
+  const hoverLayer = over(onSurface, surface, opacity('md-state-hover'))
+  return [
+    ['disabled container vs surface', ratio(disabledContainer, surface), 1.1],
+    ['disabled label vs its container', ratio(disabledLabel, disabledContainer), 2.0],
+    ['row hover layer vs surface', ratio(hoverLayer, surface), 1.05],
+    ['menu surface-container vs surface', ratio(t('md-surface-container'), surface), 1.05],
+  ]
+}
+
 let failed = 0
+function line(ok, kind, label, got, min) {
+  if (!ok) failed++
+  console.log(`${ok ? 'PASS' : 'FAIL'}  ${kind} ${label.padEnd(38)} ${got.toFixed(2)}:1 (min ${min})`)
+}
 for (const [label, fg, bg, min] of CHECKS) {
   const got = ratio(t(fg), t(bg))
-  const ok = got >= min
-  if (!ok) failed++
-  console.log(`${ok ? 'PASS' : 'FAIL'}  ${label.padEnd(34)} ${got.toFixed(2)}:1 (min ${min})`)
+  line(got >= min, 'AA   ', label, got, min)
+}
+for (const [label, fg, bg, min] of ROLE_CHECKS) {
+  const got = ratio(t(fg), t(bg))
+  line(got >= min, 'ROLE ', label, got, min)
+}
+for (const [label, got, min] of compositeChecks()) {
+  line(got >= min, 'STATE', label, got, min)
 }
 console.log(failed ? `\n${failed} FAILING` : '\nALL PASS')
 process.exit(failed ? 1 : 0)

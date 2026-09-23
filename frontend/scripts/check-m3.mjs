@@ -1,7 +1,7 @@
 // Static M3 conformance gate for component CSS. Run: npm run check:m3
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { dirname, join, sep } from 'node:path'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const src = (p) => join(here, '../src', p)
@@ -12,6 +12,14 @@ const GLOBAL_FORBIDS = [
   [/#[0-9a-fA-F]{3,8}\b/, 'raw hex color'],
   [/rgba?\(/, 'raw rgb/rgba color'],
   [/border-radius:\s*\d/, 'literal border-radius (use a --md-shape-* token)'],
+  [/border-[a-z]+-[a-z]+-radius:\s*\d/, 'literal longhand border-radius (use a --md-shape-* token)'],
+]
+
+// A state-layer consumer must not clip: the ::before sits at inset 0 and the
+// global :focus-visible ring is drawn outside the border box, so overflow
+// hidden would swallow the focus indicator.
+const STATE_LAYER_FORBIDS = [
+  [/overflow:\s*hidden/, 'overflow: hidden on a state-layer consumer clips the focus ring'],
 ]
 
 export const RULES = [
@@ -65,6 +73,7 @@ export const RULES = [
       'height: 40px',
       'var(--md-shape-full)',
       'var(--md-on-surface-variant)',
+      'inset: -4px',
     ],
   },
   {
@@ -87,6 +96,7 @@ export const RULES = [
       'var(--md-primary)',
       ':checked',
       ':indeterminate',
+      'inset: -11px',
     ],
   },
   {
@@ -161,6 +171,13 @@ export const RULES = [
       [/--shadow-lg:/, 'legacy shadow token should be retired'],
     ],
   },
+  {
+    // The Input primitive is a 56px M3 outlined field with its own border and
+    // focus outline. Nested inside .search, which already draws the field, that
+    // has to be unwound with selectors that outrank .input / .input:focus.
+    file: 'features/assets/components/AssetToolbar.module.css',
+    requires: ['.search .searchInput', '.search .searchInput:focus'],
+  },
 ]
 
 let totalFailures = 0
@@ -182,6 +199,11 @@ for (const rule of RULES) {
     for (const [pattern, why] of rule.forbids ?? []) {
       if (pattern.test(css)) problems.push(why)
     }
+    if (css.includes('composes: stateLayer from')) {
+      for (const [pattern, why] of STATE_LAYER_FORBIDS) {
+        if (pattern.test(css)) problems.push(why)
+      }
+    }
   }
   if (problems.length === 0) {
     console.log(`PASS  ${rule.file}`)
@@ -190,5 +212,33 @@ for (const rule of RULES) {
     totalFailures += problems.length
   }
 }
-console.log(totalFailures ? `\n${totalFailures} FAILING` : `\n${RULES.length} file(s) conform`)
+// RULES is a hand-written list, so a new or renamed stylesheet would otherwise
+// never be checked at all. Sweep the component and style directories and apply
+// the global forbids to anything RULES does not already name.
+function walk(dir) {
+  return readdirSync(dir).flatMap((name) => {
+    const full = join(dir, name)
+    return statSync(full).isDirectory() ? walk(full) : full.endsWith('.module.css') ? [full] : []
+  })
+}
+const named = new Set(RULES.map((r) => src(r.file)))
+let swept = 0
+for (const dir of ['components/ui', 'styles']) {
+  for (const file of walk(src(dir))) {
+    if (named.has(file)) continue
+    swept++
+    const css = readFileSync(file, 'utf8')
+    const rel = file.slice(src('').length).split(sep).join('/')
+    for (const [pattern, why] of GLOBAL_FORBIDS) {
+      if (pattern.test(css)) {
+        console.log(`FAIL  ${rel} (unlisted) — contains ${why}`)
+        totalFailures++
+      }
+    }
+  }
+}
+
+console.log(totalFailures
+  ? `\n${totalFailures} FAILING`
+  : `\n${RULES.length} file(s) conform, ${swept} unlisted file(s) swept`)
 process.exit(totalFailures ? 1 : 0)

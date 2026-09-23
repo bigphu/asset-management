@@ -23,6 +23,14 @@
   border-color: var(--md-primary);
 }
 
+/* M3 asks for a 40px touch target around the 18px box. ::after draws the
+   marks, so the target rides on ::before. */
+.checkbox::before {
+  content: '';
+  position: absolute;
+  inset: -11px;
+}
+
 /* Checkmark */
 .checkbox:checked::after {
   content: '';

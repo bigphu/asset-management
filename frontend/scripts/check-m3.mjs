@@ -79,6 +79,16 @@ export const RULES = [
     file: 'components/ui/FormField/FormField.module.css',
     requires: ['var(--md-body-sm-size)', 'var(--md-on-surface-variant)'],
   },
+  {
+    file: 'components/ui/Checkbox/Checkbox.module.css',
+    requires: [
+      'appearance: none',
+      'width: 18px',
+      'var(--md-primary)',
+      ':checked',
+      ':indeterminate',
+    ],
+  },
 ]
 
 let totalFailures = 0

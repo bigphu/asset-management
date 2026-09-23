@@ -1,6 +1,58 @@
+/* M3 checkbox: 18px box, 2px radius, drawn marks.
+   appearance: none removes the native control, so checked AND indeterminate
+   both have to be drawn here — Table's select-all header relies on the latter. */
 .checkbox {
-  width: 15px;
-  height: 15px;
-  accent-color: var(--color-accent);
+  appearance: none;
   flex: none;
+  position: relative;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 2px solid var(--md-on-surface-variant);
+  border-radius: var(--md-shape-xs);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.checkbox:checked,
+.checkbox:indeterminate {
+  background: var(--md-primary);
+  border-color: var(--md-primary);
+}
+
+/* Checkmark */
+.checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--md-on-primary);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Indeterminate dash */
+.checkbox:indeterminate::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 6px;
+  width: 10px;
+  height: 2px;
+  background: var(--md-on-primary);
+}
+
+.checkbox:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+.checkbox:disabled {
+  cursor: not-allowed;
+  border-color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-content) * 100%), transparent);
 }

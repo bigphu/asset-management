@@ -1669,7 +1669,7 @@ Leave `--radius-*` in place: `src/features/` and `src/app/` still use them and a
 - [ ] **Step 5: Run the full gate**
 
 Run: `cd frontend && npm run check && npx oxlint src`
-Expected: `tsc` clean, contrast ALL PASS, every M3 rule conforms, build succeeds, and oxlint reports only the five pre-existing `set-state-in-effect` / `exhaustive-deps` warnings.
+Expected: `tsc` clean, contrast ALL PASS, every M3 rule conforms, build succeeds, and oxlint reports only the 13 pre-existing `set-state-in-effect` / `exhaustive-deps` warnings (all in .tsx files; this plan touches only .module.css).
 
 - [ ] **Step 6: Visual sweep**
 

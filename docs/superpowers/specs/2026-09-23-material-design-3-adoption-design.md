@@ -195,7 +195,8 @@ Recorded so they read as decisions rather than mistakes:
 3. Screenshot each component in rest / hover / focus / disabled via the existing
    CDP harness, before and after.
 4. `tsc --noEmit`, `npm run build`, and `oxlint src` clean, with no new warnings
-   beyond the five pre-existing `set-state-in-effect` ones.
+   beyond the 13 pre-existing `set-state-in-effect` / `exhaustive-deps` warnings in
+   the .tsx files (counted 2026-09-23; this work touches only .module.css).
 
 ## Risks
 

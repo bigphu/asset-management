@@ -153,6 +153,14 @@ export const RULES = [
     file: 'components/ui/PageHeader/PageHeader.module.css',
     requires: ['var(--md-headline-sm-size)', 'var(--md-body-md-size)'],
   },
+  {
+    file: 'styles/tokens.css',
+    requires: ['--md-elevation-1'],
+    forbids: [
+      [/--shadow-sm:/, 'legacy shadow token should be retired'],
+      [/--shadow-lg:/, 'legacy shadow token should be retired'],
+    ],
+  },
 ]
 
 let totalFailures = 0

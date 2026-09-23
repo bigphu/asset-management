@@ -20,8 +20,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-inverse-bg);
+  color: var(--color-inverse-text);
   border-radius: 10px;
   padding: 11px 12px 11px 16px;
   box-shadow: var(--shadow-lg);

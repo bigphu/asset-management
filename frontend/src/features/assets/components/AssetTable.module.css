@@ -9,8 +9,8 @@
   width: 30px;
   height: 30px;
   border-radius: var(--radius-md);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: var(--color-status-neutral-bg);
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;

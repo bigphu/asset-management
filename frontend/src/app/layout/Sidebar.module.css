@@ -1,5 +1,6 @@
 .sidebar {
   width: var(--sidebar-width);
+  --sidebar-collapse-icon-size: 18px;
   flex: none;
   background: var(--color-sidebar-bg);
   color: var(--color-sidebar-text);
@@ -39,13 +40,28 @@
 .collapsed .brand {
   justify-content: center;
 }
+.brandIconStack {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .brandMark {
   flex: none;
+  width: 100%;
+  height: 100%;
   display: flex;
+}
+.brandMark svg {
+  width: 100%;
+  height: 100%;
 }
 .brandWord {
   font-weight: 800;
-  font-size: 15px;
+  font-size: 18px;
   letter-spacing: -0.02em;
   white-space: nowrap;
   color: var(--color-sidebar-text);
@@ -58,10 +74,39 @@
   display: none;
 }
 
+.collapseHoverIcon {
+  display: none;
+}
+.collapsed .brandIconStack .brandMark {
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+.collapsed .brandIconStack .collapseHoverIcon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: block;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: rotate(180deg);
+  transition: opacity var(--transition-fast);
+}
+.collapsed .brand:hover .brandIconStack .brandMark {
+  opacity: 0;
+}
+.collapsed .brand:hover .brandIconStack .collapseHoverIcon {
+  opacity: 1;
+}
+
 .collapseBtn {
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
   border: none;
   background: transparent;
@@ -69,6 +114,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   transition:
     background var(--transition-fast),
     color var(--transition-fast);
@@ -77,17 +123,32 @@
   background: var(--color-sidebar-hover-bg);
   color: var(--color-sidebar-text);
 }
+.collapseIcon,
+.collapseHoverIcon {
+  flex: none;
+  width: var(--sidebar-collapse-icon-size);
+  height: var(--sidebar-collapse-icon-size);
+  box-sizing: border-box;
+}
 .collapseIcon {
   transition: transform var(--transition-base);
-}
-.collapseIconFlipped {
-  transform: rotate(180deg);
 }
 
 .nav {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.navIcon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  display: flex;
+}
+.navIcon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .navItem {

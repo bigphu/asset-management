@@ -5,7 +5,7 @@
  */
 :root {
   /* ---- Color: neutrals ---- */
-  --color-bg: #f7f8fa;
+  --color-bg: #fbfeff;
   --color-surface: #ffffff;
   --color-border: #e5e7eb;
   --color-border-strong: #d1d5db;
@@ -14,10 +14,14 @@
   --color-text-faint: #9ca3af;
 
   /* ---- Color: brand accent ---- */
-  --color-accent: #3e6ff5;
-  --color-accent-hover: #2f54d9;
-  --color-accent-soft: #eaf0fe;
+  --color-accent: #25764B;
+  --color-accent-hover: #1C6340;
+  --color-accent-soft: #E7F4ED;
   --color-accent-contrast: #ffffff;
+
+  /* Accent variant for use on inverted surfaces, where the standard
+     accent is too dark to read (see --color-inverse-bg). */
+  --color-accent-on-inverse: #4FA97A;
 
   /* ---- Color: sidebar ---- */
   --color-sidebar-bg: #ffffff;
@@ -27,6 +31,12 @@
   --color-sidebar-active-bg: #f3f4f6;
   --color-sidebar-active-text: #111827;
   --color-sidebar-border: #e5e7eb;
+
+  /* ---- Color: inverted surface (dark bars on a light theme:
+     table headers, toasts) ---- */
+  --color-inverse-bg: #111827;
+  --color-inverse-text: #ffffff;
+  --color-inverse-text-muted: #9ca3af;
 
   /* ---- Color: semantic status (independent of brand accent) ---- */
   --color-status-good-bg: #dcfce7;
@@ -74,8 +84,8 @@
     0 20px 48px rgba(17, 24, 39, 0.14), 0 4px 10px rgba(17, 24, 39, 0.06);
 
   /* ---- Layout ---- */
-  --sidebar-width: 216px;
-  --sidebar-width-collapsed: 60px;
+  --sidebar-width: 226px;
+  --sidebar-width-collapsed: 64px;
 
   /* ---- Motion ---- */
   --transition-fast: 120ms ease;

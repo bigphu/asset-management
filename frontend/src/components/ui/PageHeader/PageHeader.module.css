@@ -7,14 +7,19 @@
 }
 
 .title {
-  font-size: var(--font-size-2xl);
+  font-size: var(--md-headline-sm-size);
+  line-height: var(--md-headline-sm-line);
+  letter-spacing: var(--md-headline-sm-tracking);
+  font-weight: var(--md-headline-sm-weight);
 }
 
 .subtitle {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  margin-top: 5px;
+  margin-top: 4px;
   max-width: 52ch;
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
 }
 
 .actions {

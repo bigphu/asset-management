@@ -145,6 +145,14 @@ export const RULES = [
     ],
     forbids: [[/opacity:\s*0\.3/, 'disabled must use 0.38 content, not 0.3']],
   },
+  {
+    file: 'components/ui/EmptyState/EmptyState.module.css',
+    requires: ['var(--md-title-md-size)', 'var(--md-body-md-size)'],
+  },
+  {
+    file: 'components/ui/PageHeader/PageHeader.module.css',
+    requires: ['var(--md-headline-sm-size)', 'var(--md-body-md-size)'],
+  },
 ]
 
 let totalFailures = 0

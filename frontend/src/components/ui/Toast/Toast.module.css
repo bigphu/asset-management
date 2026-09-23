@@ -16,39 +16,47 @@
   pointer-events: auto;
 }
 
+/* M3 snackbar */
 .toast {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  background: var(--color-inverse-bg);
-  color: var(--color-inverse-text);
-  border-radius: 10px;
-  padding: 11px 12px 11px 16px;
-  box-shadow: var(--shadow-lg);
-  font-size: var(--font-size-sm);
+  min-height: 48px;
+  padding: 0 8px 0 16px;
+  border-radius: var(--md-shape-xs);
+  background: var(--md-inverse-surface);
+  color: var(--md-inverse-on-surface);
+  box-shadow: var(--md-elevation-3);
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
 }
 
+/* M3 snackbar action */
 .undo {
+  composes: stateLayer from '../../../styles/state-layer.module.css';
+  height: 36px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--md-shape-full);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: inherit;
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 12.5px;
-  font-weight: 600;
-}
-.undo:hover {
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--md-inverse-primary);
+  font-size: var(--md-label-lg-size);
+  line-height: var(--md-label-lg-line);
+  letter-spacing: var(--md-label-lg-tracking);
+  font-weight: var(--md-label-lg-weight);
 }
 
+/* M3 snackbar icon button */
 .close {
-  background: transparent;
-  border: none;
-  color: inherit;
-  opacity: 0.55;
-  padding: 2px;
+  composes: stateLayer from '../../../styles/state-layer.module.css';
   display: flex;
-}
-.close:hover {
-  opacity: 1;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--md-shape-full);
+  background: transparent;
+  color: inherit;
 }

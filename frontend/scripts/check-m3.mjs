@@ -112,6 +112,16 @@ export const RULES = [
       'var(--md-title-lg-size)',
     ],
   },
+  {
+    file: 'components/ui/Toast/Toast.module.css',
+    requires: [
+      'var(--md-inverse-surface)',
+      'var(--md-inverse-on-surface)',
+      'var(--md-inverse-primary)',
+      'var(--md-elevation-3)',
+      'var(--md-shape-xs)',
+    ],
+  },
 ]
 
 let totalFailures = 0

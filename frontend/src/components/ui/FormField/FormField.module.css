@@ -1,16 +1,23 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
+/* M3 text field label */
 .label {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  color: var(--color-text-muted);
+  font-size: var(--md-body-sm-size);
+  line-height: var(--md-body-sm-line);
+  letter-spacing: var(--md-body-sm-tracking);
+  font-weight: var(--md-body-sm-weight);
+  color: var(--md-on-surface-variant);
 }
 
+/* M3 supporting text — 16px inset to align with the field's text baseline */
 .hint {
-  font-size: 11.5px;
-  color: var(--color-text-faint);
+  padding: 0 16px;
+  font-size: var(--md-body-sm-size);
+  line-height: var(--md-body-sm-line);
+  letter-spacing: var(--md-body-sm-tracking);
+  color: var(--md-on-surface-variant);
 }

@@ -1,18 +1,33 @@
+/* M3 outlined text field. */
 .input {
   width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 9px 11px;
-  background: var(--color-bg);
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-shape-xs);
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  font-size: var(--md-body-lg-size);
+  line-height: var(--md-body-lg-line);
+  letter-spacing: var(--md-body-lg-tracking);
   transition: border-color var(--transition-fast);
 }
 
+.input:hover:not(:disabled) {
+  border-color: var(--md-on-surface);
+}
+
 .input:focus {
-  background: var(--color-surface);
-  border-color: var(--color-accent);
+  border: 2px solid var(--md-primary);
+  padding: 0 15px; /* keep text from shifting when the outline thickens */
   outline: none;
 }
 
 .input::placeholder {
-  color: var(--color-text-faint);
+  color: var(--md-on-surface-variant);
+}
+
+.input:disabled {
+  border-color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-container) * 100%), transparent);
+  color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-content) * 100%), transparent);
 }

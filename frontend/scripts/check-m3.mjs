@@ -67,6 +67,18 @@ export const RULES = [
       'var(--md-on-surface-variant)',
     ],
   },
+  {
+    file: 'components/ui/Input/Input.module.css',
+    requires: ['height: 56px', 'var(--md-shape-xs)', 'var(--md-outline)', 'var(--md-body-lg-size)'],
+  },
+  {
+    file: 'components/ui/Select/Select.module.css',
+    requires: ['height: 56px', 'var(--md-shape-xs)', 'var(--md-outline)'],
+  },
+  {
+    file: 'components/ui/FormField/FormField.module.css',
+    requires: ['var(--md-body-sm-size)', 'var(--md-on-surface-variant)'],
+  },
 ]
 
 let totalFailures = 0

@@ -93,6 +93,16 @@ export const RULES = [
     file: 'components/ui/Card/Card.module.css',
     requires: ['var(--md-shape-md)', 'var(--md-outline-variant)', 'var(--md-elevation-0)'],
   },
+  {
+    file: 'components/ui/Menu/Menu.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'var(--md-elevation-2)',
+      'var(--md-shape-xs)',
+      'var(--md-surface-container)',
+      'height: 48px',
+    ],
+  },
 ]
 
 let totalFailures = 0

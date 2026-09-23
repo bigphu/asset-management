@@ -122,6 +122,10 @@ export const RULES = [
       'var(--md-shape-xs)',
     ],
   },
+  {
+    file: 'components/ui/Badge/Badge.module.css',
+    requires: ['var(--md-shape-sm)', 'var(--md-label-md-size)'],
+  },
 ]
 
 let totalFailures = 0

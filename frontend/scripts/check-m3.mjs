@@ -103,6 +103,15 @@ export const RULES = [
       'height: 48px',
     ],
   },
+  {
+    file: 'components/ui/Drawer/Drawer.module.css',
+    requires: [
+      'var(--md-scrim)',
+      'var(--md-elevation-1)',
+      'var(--md-shape-lg)',
+      'var(--md-title-lg-size)',
+    ],
+  },
 ]
 
 let totalFailures = 0

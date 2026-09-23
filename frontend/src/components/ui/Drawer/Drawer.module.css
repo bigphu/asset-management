@@ -1,7 +1,7 @@
 .scrim {
   position: fixed;
   inset: 0;
-  background: rgba(17, 24, 39, 0.32);
+  background: var(--md-scrim);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--transition-base);
@@ -18,9 +18,10 @@
   right: 0;
   height: 100vh;
   width: min(420px, 92vw);
-  background: var(--color-surface);
-  border-left: 1px solid var(--color-border);
-  box-shadow: var(--shadow-lg);
+  background: var(--md-surface);
+  border-top-left-radius: var(--md-shape-lg);
+  border-bottom-left-radius: var(--md-shape-lg);
+  box-shadow: var(--md-elevation-1);
   transform: translateX(100%);
   transition: transform var(--transition-base);
   z-index: 50;
@@ -39,21 +40,26 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: 20px 22px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 24px;
+  border-bottom: 1px solid var(--md-outline-variant);
   flex: none;
 }
 .title {
-  font-size: 16.5px;
+  font-size: var(--md-title-lg-size);
+  line-height: var(--md-title-lg-line);
+  letter-spacing: var(--md-title-lg-tracking);
+  font-weight: var(--md-title-lg-weight);
 }
 .description {
-  color: var(--color-text-muted);
-  font-size: 12.5px;
-  margin-top: 3px;
+  margin-top: 4px;
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
 }
 
 .body {
-  padding: 20px 22px;
+  padding: 24px;
   overflow-y: auto;
   flex: 1;
   display: flex;
@@ -65,7 +71,7 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--space-2);
-  padding: 16px 22px;
-  border-top: 1px solid var(--color-border);
+  padding: 16px 24px;
+  border-top: 1px solid var(--md-outline-variant);
   flex: none;
 }

@@ -27,14 +27,24 @@ const NAV_ITEMS: NavItem[] = [
 export function Sidebar() {
   const collapsed = useAppSelector((state) => state.ui.sidebarCollapsed)
   const dispatch = useAppDispatch()
+  const BrandTag = collapsed ? 'button' : 'div'
 
   return (
     <aside className={cn(styles.sidebar, collapsed && styles.collapsed)}>
       <div className={styles.top}>
-        <div
+        {/* Collapsed, the brand IS the expand control, so it has to be a real
+            button — otherwise collapsing the sidebar strands keyboard users
+            with no focusable way to bring it back. */}
+        <BrandTag
           className={cn(styles.brand, collapsed && styles.collapseBtn)}
-          title={collapsed ? 'Expand sidebar' : ''}
-          onClick={collapsed ? () => dispatch(toggleSidebar()) : undefined}
+          {...(collapsed
+            ? {
+                type: 'button' as const,
+                'aria-label': 'Expand sidebar',
+                title: 'Expand sidebar',
+                onClick: () => dispatch(toggleSidebar()),
+              }
+            : {})}
         >
           <span className={styles.brandIconStack}>
             <span className={styles.brandMark} aria-hidden="true">
@@ -51,7 +61,7 @@ export function Sidebar() {
           <span className={styles.brandWord}>
             Asset<span className={styles.brandWordAccent}>Ledger</span>
           </span>
-        </div>
+        </BrandTag>
 
         {!collapsed &&
           <button

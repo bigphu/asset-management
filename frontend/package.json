@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:m3": "node scripts/check-m3.mjs",
-    "check": "tsc --noEmit && npm run check:contrast && npm run check:m3 && npm run build"
+    "check": "tsc --noEmit && npm run check:contrast && npm run check:m3 && npm run check:a11y && npm run build",
+    "check:a11y": "node scripts/check-a11y.mjs"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",

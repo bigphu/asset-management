@@ -27,7 +27,11 @@ export function Drawer({ open, onClose, title, description, wide, children, foot
 
   return (
     <>
-      <div className={cn(styles.scrim, open && styles.scrimOpen)} onClick={onClose} />
+      <div
+        className={cn(styles.scrim, open && styles.scrimOpen)}
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <aside
         className={cn(styles.drawer, wide && styles.wide, open && styles.open)}
         aria-hidden={!open}

@@ -32,6 +32,11 @@
 
 .brand {
   display: flex;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  padding: 0;
   align-items: center;
   gap: 9px;
   overflow: hidden;
@@ -96,10 +101,12 @@
   transform: rotate(180deg);
   transition: opacity var(--transition-fast);
 }
-.collapsed .brand:hover .brandIconStack .brandMark {
+.collapsed .brand:hover .brandIconStack .brandMark,
+.collapsed .brand:focus-visible .brandIconStack .brandMark {
   opacity: 0;
 }
-.collapsed .brand:hover .brandIconStack .collapseHoverIcon {
+.collapsed .brand:hover .brandIconStack .collapseHoverIcon,
+.collapsed .brand:focus-visible .brandIconStack .collapseHoverIcon {
   opacity: 1;
 }
 

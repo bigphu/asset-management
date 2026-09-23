@@ -126,6 +126,15 @@ export const RULES = [
     file: 'components/ui/Badge/Badge.module.css',
     requires: ['var(--md-shape-sm)', 'var(--md-label-md-size)'],
   },
+  {
+    file: 'components/ui/Table/Table.module.css',
+    requires: [
+      'var(--md-outline-variant)',
+      'var(--md-label-lg-size)',
+      'height: 44px',
+      'var(--md-inverse-surface)',
+    ],
+  },
 ]
 
 let totalFailures = 0

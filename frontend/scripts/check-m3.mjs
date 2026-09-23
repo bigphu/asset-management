@@ -15,7 +15,20 @@ const GLOBAL_FORBIDS = [
 ]
 
 export const RULES = [
-  // Each task appends: { file: 'components/ui/X/X.module.css', requires: [...], forbids: [...] }
+  {
+    file: 'styles/tokens.css',
+    requires: [
+      '--md-shape-xs: 4px', '--md-shape-sm: 8px', '--md-shape-md: 12px',
+      '--md-shape-lg: 16px', '--md-shape-xl: 28px', '--md-shape-full: 999px',
+      '--md-elevation-0', '--md-elevation-1', '--md-elevation-2',
+      '--md-elevation-3', '--md-elevation-4', '--md-elevation-5',
+      '--md-state-hover: 0.08', '--md-state-focus: 0.1', '--md-state-pressed: 0.1',
+      '--md-state-dragged: 0.16', '--md-state-disabled-content: 0.38',
+      '--md-state-disabled-container: 0.12',
+      '--md-label-lg-size: 14px', '--md-body-md-size: 14px', '--md-title-lg-size: 22px',
+      '--md-primary:', '--md-on-primary:', '--md-outline-variant:', '--md-scrim:',
+    ],
+  },
 ]
 
 let totalFailures = 0

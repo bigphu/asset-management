@@ -1,5 +1,7 @@
+/* M3 outlined card: elevation 0, outline-variant border, 12px corners. */
 .card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  background: var(--md-surface);
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--md-shape-md);
+  box-shadow: var(--md-elevation-0);
 }

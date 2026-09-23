@@ -89,6 +89,10 @@ export const RULES = [
       ':indeterminate',
     ],
   },
+  {
+    file: 'components/ui/Card/Card.module.css',
+    requires: ['var(--md-shape-md)', 'var(--md-outline-variant)', 'var(--md-elevation-0)'],
+  },
 ]
 
 let totalFailures = 0

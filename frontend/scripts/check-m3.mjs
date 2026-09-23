@@ -29,6 +29,34 @@ export const RULES = [
       '--md-primary:', '--md-on-primary:', '--md-outline-variant:', '--md-scrim:',
     ],
   },
+  {
+    file: 'styles/state-layer.module.css',
+    requires: [
+      '.stateLayer',
+      'isolation: isolate',
+      'background: currentColor',
+      'var(--md-state-hover)',
+      'var(--md-state-focus)',
+      'var(--md-state-pressed)',
+      'z-index: 0',
+    ],
+  },
+  {
+    file: 'components/ui/Button/Button.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'height: 40px',
+      'var(--md-shape-full)',
+      'var(--md-label-lg-size)',
+      'var(--md-state-disabled-content)',
+      'var(--md-state-disabled-container)',
+      'var(--md-elevation-0)',
+    ],
+    forbids: [
+      [/translateY/, 'M3 uses state layers, not a translate on press'],
+      [/opacity:\s*0\.5/, 'disabled must use 0.38 content / 0.12 container, not 0.5'],
+    ],
+  },
 ]
 
 let totalFailures = 0

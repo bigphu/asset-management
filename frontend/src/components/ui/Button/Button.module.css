@@ -1,66 +1,71 @@
 .button {
+  composes: stateLayer from '../../../styles/state-layer.module.css';
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--md-shape-full);
   background: transparent;
-  color: var(--color-text);
-  font-weight: 600;
+  color: var(--md-on-surface);
+  box-shadow: var(--md-elevation-0);
+  font-size: var(--md-label-lg-size);
+  line-height: var(--md-label-lg-line);
+  letter-spacing: var(--md-label-lg-tracking);
+  font-weight: var(--md-label-lg-weight);
   white-space: nowrap;
   transition:
     background var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.button:active {
-  transform: translateY(1px);
+    border-color var(--transition-fast);
 }
 
 .button:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-content) * 100%), transparent);
 }
 
+/* Sizes — sm is M3 density -2 for dense toolbars. */
 .md {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--font-size-sm);
+  height: 40px;
 }
 
 .sm {
-  padding: 6px 11px;
-  font-size: var(--font-size-xs);
-  border-radius: var(--radius-sm);
+  height: 32px;
+  padding: 0 16px;
+  font-size: var(--md-label-md-size);
+  line-height: var(--md-label-md-line);
+  letter-spacing: var(--md-label-md-tracking);
 }
 
+/* Filled button */
 .primary {
-  background: var(--color-accent);
-  color: var(--color-accent-contrast);
-}
-.primary:hover:not(:disabled) {
-  background: var(--color-accent-hover);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
 }
 
+.primary:disabled {
+  background: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-container) * 100%), transparent);
+}
+
+/* Outlined button */
 .outline {
-  border-color: var(--color-border-strong);
-  font-weight: 500;
-}
-.outline:hover:not(:disabled) {
-  background: var(--color-bg);
-  border-color: var(--color-text-faint);
+  border: 1px solid var(--md-outline);
+  color: var(--md-primary);
 }
 
-.ghost {
-  font-weight: 500;
+.outline:disabled {
+  border-color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-container) * 100%), transparent);
 }
-.ghost:hover:not(:disabled) {
-  background: var(--color-bg);
+
+/* Text buttons — 12px padding per M3 */
+.ghost {
+  padding: 0 12px;
+  color: var(--md-on-surface);
 }
 
 .ghost-accent {
-  color: var(--color-accent);
-}
-.ghost-accent:hover:not(:disabled) {
-  background: var(--color-accent-soft);
+  padding: 0 12px;
+  color: var(--md-primary);
 }

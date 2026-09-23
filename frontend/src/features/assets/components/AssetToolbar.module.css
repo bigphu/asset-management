@@ -14,8 +14,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  height: 40px;
-  padding: 0 12px;
+  /* 56px to match Select and the Input primitive: in M3 these are all the same
+     text-field component, and buttons being shorter than fields is expected. */
+  height: 56px;
+  padding: 0 16px;
   width: 210px;
   background: var(--md-surface);
   border: 1px solid var(--md-outline);

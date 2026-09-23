@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:m3": "node scripts/check-m3.mjs",
+    "check": "tsc --noEmit && npm run check:contrast && npm run check:m3 && npm run build"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",

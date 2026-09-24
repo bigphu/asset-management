@@ -8,12 +8,20 @@ import { useAppSelector } from '@/app/store'
 import { ExportModal, type ExportScope } from '@/features/export-profiles'
 import { useDeleteAssetMutation, useRestoreAssetMutation } from '../api/assets.api'
 import { useAssetPage } from '../hooks/useAssetPage'
+import { useListUrlSync } from '../hooks/useListUrlSync'
 import type { Asset } from '../types'
 import { AssetFormModal } from '../components/AssetFormModal'
 import { AssetTable } from '../components/AssetTable'
 import { AssetToolbar } from '../components/AssetToolbar'
 
 export function InventoryPage() {
+  // Search, filters, sort and page live in the URL too (S-02: they survive a
+  // reload). Wait for the URL to be applied so the first request uses it.
+  const ready = useListUrlSync()
+  return ready ? <InventoryView /> : null
+}
+
+function InventoryView() {
   const sort = useAppSelector((state) => state.assetsUi.sort)
   const assetPage = useAssetPage()
 

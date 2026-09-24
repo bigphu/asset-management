@@ -1,3 +1,13 @@
+# Full stack behind one entry point:  http://localhost:8080
+#
+#   browser ──► gateway (nginx :80) ──┬── /        → built SPA (static)
+#                                     └── /api/*   → backend (Express :3000) ──► db (Postgres :5432)
+#
+# API docs (Swagger UI): http://localhost:8080/api/docs/
+#
+# `docker compose up -d db` still starts only the database for local
+# development (Vite on :5173 + `npm run dev` in backend/).
+
 services:
   db:
     image: postgres:16
@@ -8,7 +18,8 @@ services:
       POSTGRES_USER: asset_app
       POSTGRES_PASSWORD: asset_app_dev
     ports:
-      - "5432:5432"
+      # Override when 5432 is taken (e.g. a native PostgreSQL): DB_HOST_PORT=55432
+      - "${DB_HOST_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./backend/db/init:/docker-entrypoint-initdb.d:ro
@@ -17,6 +28,40 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: asset-management-backend
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: asset_management
+      DB_USER: asset_app
+      DB_PASSWORD: asset_app_dev
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-local-env}
+    # Not published: only the gateway reaches the API.
+    expose:
+      - "3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: asset-management-gateway
+    restart: unless-stopped
+    environment:
+      API_UPSTREAM: backend:3000
+    ports:
+      - "${GATEWAY_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   db_data:

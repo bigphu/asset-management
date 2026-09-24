@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react'
-import { Button, Drawer, FormField, Input, Select } from '@/components/ui'
+import { Button, FormField, Modal, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { useCreateProfileMutation, useProfilesQuery } from '../api/profiles.api'
 import { useExportColumns } from '../hooks/useExportColumns'
 import { DEFAULT_EXPORT_COLUMNS, type ExportDateFormat } from '../types'
 import { ColumnEditor } from './ColumnEditor'
-import styles from './ExportDrawer.module.css'
+import styles from './ExportModal.module.css'
 
-export interface ExportDrawerProps {
+export interface ExportModalProps {
   open: boolean
   onClose: () => void
   /** Row count the export will contain — every asset matching the current filters (ADR-0008). */
   scopeCount: number
 }
 
-/** The "Export to Excel" drawer opened from the Inventory page (S-03 / S-04). */
-export function ExportDrawer({ open, onClose, scopeCount }: ExportDrawerProps) {
+/** The "Export to Excel" dialog opened from the Inventory page (S-03 / S-04). */
+export function ExportModal({ open, onClose, scopeCount }: ExportModalProps) {
   const { data: profiles = [] } = useProfilesQuery()
   const createProfile = useCreateProfileMutation()
   const toast = useToast()
@@ -26,7 +26,7 @@ export function ExportDrawer({ open, onClose, scopeCount }: ExportDrawerProps) {
   const { columns, reset, toggle, rename, move } = useExportColumns(DEFAULT_EXPORT_COLUMNS)
 
   // Intentionally keyed on `open` alone: this should reset the form each time
-  // the drawer opens, not whenever `reset`'s identity changes between renders.
+  // the dialog opens, not whenever `reset`'s identity changes between renders.
   useEffect(() => {
     if (!open) return
     setProfileId('')
@@ -70,7 +70,7 @@ export function ExportDrawer({ open, onClose, scopeCount }: ExportDrawerProps) {
   }
 
   return (
-    <Drawer
+    <Modal
       open={open}
       onClose={onClose}
       title="Export to Excel"
@@ -138,6 +138,6 @@ export function ExportDrawer({ open, onClose, scopeCount }: ExportDrawerProps) {
           </Button>
         </div>
       </div>
-    </Drawer>
+    </Modal>
   )
 }

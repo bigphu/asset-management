@@ -52,6 +52,7 @@
 /* Outlined button */
 .outline {
   border: 1px solid var(--md-outline);
+  background: var(--md-surface);
   color: var(--md-primary);
 }
 

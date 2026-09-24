@@ -78,11 +78,12 @@ export const RULES = [
   },
   {
     file: 'components/ui/Input/Input.module.css',
-    requires: ['height: 56px', 'var(--md-shape-xs)', 'var(--md-outline)', 'var(--md-body-lg-size)'],
+    // Density -1. Pinned so a field cannot silently drift back to 56px.
+    requires: ['height: 48px', 'var(--md-shape-xs)', 'var(--md-outline)', 'var(--md-body-lg-size)'],
   },
   {
     file: 'components/ui/Select/Select.module.css',
-    requires: ['height: 56px', 'var(--md-shape-xs)', 'var(--md-outline)'],
+    requires: ['height: 48px', 'var(--md-shape-xs)', 'var(--md-outline)'],
   },
   {
     file: 'components/ui/FormField/FormField.module.css',
@@ -123,6 +124,15 @@ export const RULES = [
     ],
   },
   {
+    file: 'components/ui/Modal/Modal.module.css',
+    requires: [
+      'var(--md-scrim)',
+      'var(--md-elevation-3)',
+      'var(--md-shape-xl)',
+      'var(--md-title-lg-size)',
+    ],
+  },
+  {
     file: 'components/ui/Toast/Toast.module.css',
     requires: [
       'var(--md-inverse-surface)',
@@ -142,7 +152,13 @@ export const RULES = [
       'var(--md-outline-variant)',
       'var(--md-label-lg-size)',
       'height: 44px',
-      'var(--md-inverse-surface)',
+      // The header is an M3 surface-container tint now, not the inverse slab.
+      'var(--md-surface-container)',
+      // A consumer colgroup is only authoritative under fixed layout.
+      'table-layout: fixed',
+    ],
+    forbids: [
+      [/--md-inverse-surface/, 'the inverse-surface header was retired; use --md-surface-container'],
     ],
   },
   {
@@ -175,7 +191,7 @@ export const RULES = [
     // The Input primitive is a 56px M3 outlined field with its own border and
     // focus outline. Nested inside .search, which already draws the field, that
     // has to be unwound with selectors that outrank .input / .input:focus.
-    file: 'features/assets/components/AssetToolbar.module.css',
+    file: 'components/ui/SearchField/SearchField.module.css',
     requires: ['.search .searchInput', '.search .searchInput:focus'],
   },
 ]

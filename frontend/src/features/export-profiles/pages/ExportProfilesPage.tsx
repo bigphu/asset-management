@@ -1,4 +1,6 @@
-import { Button, PageHeader } from '@/components/ui'
+import { useState } from 'react'
+import { Plus } from 'lucide-react'
+import { Button, PageHeader, SearchField } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { useAppDispatch, useAppSelector } from '@/app/store'
 import {
@@ -6,10 +8,11 @@ import {
   useDeleteProfileMutation,
   useProfilesQuery,
 } from '../api/profiles.api'
-import { closeProfileDrawer, openEditProfile, openNewProfile } from '../store/exportProfilesUiSlice'
+import { closeProfileForm, openEditProfile, openNewProfile } from '../store/exportProfilesUiSlice'
 import type { ExportProfile } from '../types'
-import { ProfileFormDrawer } from '../components/ProfileFormDrawer'
+import { ProfileFormModal } from '../components/ProfileFormModal'
 import { ProfileList } from '../components/ProfileList'
+import styles from './ExportProfilesPage.module.css'
 
 export function ExportProfilesPage() {
   const dispatch = useAppDispatch()
@@ -19,6 +22,13 @@ export function ExportProfilesPage() {
   const deleteProfile = useDeleteProfileMutation()
   const createProfile = useCreateProfileMutation()
   const toast = useToast()
+
+  // Page-local: unlike the inventory filters, nothing else needs to read it.
+  const [search, setSearch] = useState('')
+  const query = search.trim().toLowerCase()
+  const visible = query
+    ? profiles.filter((p) => p.name.toLowerCase().includes(query))
+    : profiles
 
   function handleDelete(profile: ExportProfile) {
     deleteProfile.mutate(profile.id, {
@@ -41,26 +51,37 @@ export function ExportProfilesPage() {
       <PageHeader
         title="Export profiles"
         subtitle="Save a column layout, header labels and date format once, then reuse it every time you export."
-        actions={
-          <Button variant="primary" onClick={() => dispatch(openNewProfile())}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            New profile
-          </Button>
-        }
       />
 
+      {/* Same shape as the Inventory toolbar: search takes the slack, the
+          primary action sits at the right end. */}
+      <div className={styles.toolbar}>
+        <SearchField
+          className={styles.search}
+          placeholder="Search profiles…"
+          aria-label="Search profiles by name"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button variant="primary" onClick={() => dispatch(openNewProfile())}>
+          <Plus size={18} aria-hidden="true" />
+          New profile
+        </Button>
+      </div>
+
       <ProfileList
-        profiles={profiles}
+        profiles={visible}
+        totalCount={profiles.length}
         isLoading={isLoading}
+        onCreate={() => dispatch(openNewProfile())}
+        onClearSearch={() => setSearch('')}
         onEdit={(profile) => dispatch(openEditProfile(profile.id))}
         onDelete={handleDelete}
       />
 
-      <ProfileFormDrawer
+      <ProfileFormModal
         editingProfileId={editingProfileId}
-        onClose={() => dispatch(closeProfileDrawer())}
+        onClose={() => dispatch(closeProfileForm())}
       />
     </>
   )

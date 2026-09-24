@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Button, Drawer, FormField, Input, Select } from '@/components/ui'
+import { Button, FormField, Modal, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import {
   useCreateProfileMutation,
@@ -9,15 +9,15 @@ import {
 import { useExportColumns } from '../hooks/useExportColumns'
 import { DEFAULT_EXPORT_COLUMNS, type ExportDateFormat } from '../types'
 import { ColumnEditor } from './ColumnEditor'
-import styles from './ExportDrawer.module.css'
+import styles from './ExportModal.module.css'
 
-export interface ProfileFormDrawerProps {
+export interface ProfileFormModalProps {
   /** null = closed, 'new' = creating, an id = editing that profile. */
   editingProfileId: string | 'new' | null
   onClose: () => void
 }
 
-export function ProfileFormDrawer({ editingProfileId, onClose }: ProfileFormDrawerProps) {
+export function ProfileFormModal({ editingProfileId, onClose }: ProfileFormModalProps) {
   const { data: profiles = [] } = useProfilesQuery()
   const createProfile = useCreateProfileMutation()
   const updateProfile = useUpdateProfileMutation()
@@ -30,8 +30,8 @@ export function ProfileFormDrawer({ editingProfileId, onClose }: ProfileFormDraw
   const [dateFormat, setDateFormat] = useState<ExportDateFormat>('DD/MM/YYYY')
   const { columns, reset, toggle, rename, move } = useExportColumns(DEFAULT_EXPORT_COLUMNS)
 
-  // See the same note in AssetFormDrawer: the Drawer stays mounted for its
-  // slide animation, so resetting via effect (not a `key` remount) is the
+  // Same reasoning as AssetFormModal: the Modal stays mounted for its
+  // open/close transition, so resetting via effect (not a `key` remount) is the
   // pragmatic choice, keyed on open state + which profile is being edited.
   useEffect(() => {
     if (!open) return
@@ -69,7 +69,7 @@ export function ProfileFormDrawer({ editingProfileId, onClose }: ProfileFormDraw
   const isSaving = createProfile.isPending || updateProfile.isPending
 
   return (
-    <Drawer
+    <Modal
       open={open}
       onClose={onClose}
       title={existing ? 'Edit profile' : 'New export profile'}
@@ -114,6 +114,6 @@ export function ProfileFormDrawer({ editingProfileId, onClose }: ProfileFormDraw
           </Select>
         </FormField>
       </form>
-    </Drawer>
+    </Modal>
   )
 }

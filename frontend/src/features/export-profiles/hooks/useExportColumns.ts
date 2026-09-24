@@ -17,12 +17,13 @@ export function useExportColumns(initial: ExportColumn[]) {
     setColumns((cols) => cols.map((c, i) => (i === index ? { ...c, label } : c)))
   }
 
-  function move(index: number, direction: -1 | 1) {
+  /** Take the column at `from` out and reinsert it at `to`. */
+  function move(from: number, to: number) {
     setColumns((cols) => {
-      const target = index + direction
-      if (target < 0 || target >= cols.length) return cols
+      if (from === to || to < 0 || to >= cols.length) return cols
       const next = [...cols]
-      ;[next[index], next[target]] = [next[target], next[index]]
+      const [moved] = next.splice(from, 1)
+      next.splice(to, 0, moved)
       return next
     })
   }

@@ -11,6 +11,15 @@
   padding: 40px 44px 60px;
 }
 
+/* The content column is uncapped by flex, so on a wide display every row
+   stretches to the window: table columns drift apart and list-row actions end
+   up hundreds of pixels from the title they belong to. Cap the measure and
+   centre it; below the cap this is a no-op. */
+.inner {
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
 @media (max-width: 900px) {
   .content {
     padding: 24px 18px 50px;

@@ -7,8 +7,12 @@ export function AppLayout() {
   return (
     <div className={styles.app}>
       <Sidebar />
+      {/* .content owns the scroll and the padding; .inner caps the measure, so
+          the cap applies to the page content without clipping the scrollbar. */}
       <main className={styles.content}>
-        <Outlet />
+        <div className={styles.inner}>
+          <Outlet />
+        </div>
       </main>
     </div>
   )

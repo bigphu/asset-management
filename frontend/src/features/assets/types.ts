@@ -38,9 +38,21 @@ export interface AssetSort {
   direction: SortDirection
 }
 
+export const FILTER_FIELDS = ['type', 'status', 'location'] as const
+export type FilterField = (typeof FILTER_FIELDS)[number]
+
+export type FilterOperator = 'is' | 'isNot'
+
+/** One row of the Filters popover, e.g. "Status is In Use". */
+export interface FilterCondition {
+  id: string
+  field: FilterField
+  operator: FilterOperator
+  /** '' while the user has not picked a value yet — such a row is ignored. */
+  value: string
+}
+
 export interface AssetFilters {
   search: string
-  type: AssetType | ''
-  status: AssetStatus | ''
-  location: string
+  conditions: FilterCondition[]
 }

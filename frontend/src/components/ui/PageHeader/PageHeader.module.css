@@ -10,7 +10,8 @@
   font-size: var(--md-headline-sm-size);
   line-height: var(--md-headline-sm-line);
   letter-spacing: var(--md-headline-sm-tracking);
-  font-weight: var(--md-headline-sm-weight);
+  /* font-weight: var(--md-headline-md-weight); */
+  font-weight: extra-bold;
 }
 
 .subtitle {

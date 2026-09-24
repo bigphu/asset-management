@@ -1,0 +1,43 @@
+.search {
+  display: flex;
+  align-items: center;
+  /* 12px between the icon and the input text, so the two read as one unit. */
+  gap: var(--space-3);
+  /* Matches Select and the Input primitive at density -1: in M3 these are all
+     the same text-field component, and buttons being shorter than fields is
+     expected. */
+  height: 40px;
+  /* 16px matches Select's text inset, so every control in a toolbar starts
+     its content at the same depth. */
+  padding: 0 16px;
+  background: var(--md-surface);
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-shape-xs);
+  color: var(--md-on-surface-variant);
+}
+.search:focus-within {
+  border-color: var(--md-primary);
+}
+
+/* The Input primitive is a full M3 outlined text field: 56px tall, with its own
+   1px border and a 2px focus outline that also shifts padding. Here it sits
+   inside .search, which already draws the field, so all of that has to be
+   unwound — with descendant selectors, because .input:focus would otherwise
+   outrank a bare .searchInput and redraw a second border mid-focus. */
+.search .searchInput {
+  height: auto;
+  border: none;
+  background: transparent;
+  padding: 0;
+  width: 100%;
+  color: var(--md-on-surface);
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
+}
+.search .searchInput:focus {
+  border: none;
+  padding: 0;
+  background: transparent;
+  outline: none;
+}

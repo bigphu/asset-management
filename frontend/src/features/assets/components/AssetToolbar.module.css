@@ -1,3 +1,5 @@
+/* Search on the left takes the slack; Filters / Export / Add record sit as one
+   cluster on the right, as on the Cloudflare dashboard. */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -6,47 +8,136 @@
   margin-bottom: var(--space-4);
 }
 
-.spacer {
-  flex: 1 1 auto;
-}
-
-.search {
+.actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  /* 56px to match Select and the Input primitive: in M3 these are all the same
-     text-field component, and buttons being shorter than fields is expected. */
-  height: 56px;
-  padding: 0 16px;
-  width: 210px;
-  background: var(--md-surface);
-  border: 1px solid var(--md-outline);
-  border-radius: var(--md-shape-xs);
-  color: var(--md-on-surface-variant);
-}
-.search:focus-within {
-  border-color: var(--md-primary);
+  margin-left: auto;
 }
 
-/* The Input primitive is a full M3 outlined text field: 56px tall, with its own
-   1px border and a 2px focus outline that also shifts padding. Here it sits
-   inside .search, which already draws the field, so all of that has to be
-   unwound — with descendant selectors, because .input:focus would otherwise
-   outrank a bare .searchInput and redraw a second border mid-focus. */
-.search .searchInput {
-  height: auto;
-  border: none;
-  background: transparent;
-  padding: 0;
-  width: 100%;
+/* Anchor for the popover. */
+.filters {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Active-filter count on the Filters button: a small M3 badge. */
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--md-shape-full);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  font-size: var(--md-label-md-size);
+  line-height: var(--md-label-md-line);
+  font-weight: var(--md-label-md-weight);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Same surface and elevation as the Menu primitive, wide enough for a form. */
+.panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  /* padding: 0px 100px; */
+  width: 520px;
+  /* Never wider than the viewport minus the 16px page gutters. */
+  max-width: calc(100vw - 2 * var(--space-4));
+  padding: var(--space-5);
+  border-radius: var(--md-shape-sm);
+  background: var(--md-surface);
+  box-shadow: var(--md-elevation-2);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* The sm text button carries its own 12px inset; pull it flush right. */
+  margin-right: calc(var(--space-3) * -1);
+}
+
+.panelTitle {
   color: var(--md-on-surface);
+  font-size: var(--md-title-sm-size);
+  line-height: var(--md-title-sm-line);
+  letter-spacing: var(--md-title-sm-tracking);
+  font-weight: var(--md-title-sm-weight);
+}
+
+.panelEmpty {
+  margin: 0;
+  color: var(--md-on-surface-variant);
   font-size: var(--md-body-md-size);
   line-height: var(--md-body-md-line);
   letter-spacing: var(--md-body-md-tracking);
 }
-.search .searchInput:focus {
-  border: none;
+
+.conditions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
   padding: 0;
-  background: transparent;
-  outline: none;
+  list-style: none;
+}
+
+/* Field · operator · value · remove. The value column takes the slack, since
+   location names are the longest thing in the row. */
+.condition {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr 40px;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.conditionSelect {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Too narrow for four columns: stack field and operator full width, and keep
+   remove beside the value. */
+@media (max-width: 560px) {
+  .condition {
+    grid-template-columns: 1fr 40px;
+  }
+  .condition > :nth-child(1),
+  .condition > :nth-child(2) {
+    grid-column: 1 / -1;
+  }
+}
+
+.panelFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  /* Mirror of .panelHeader: pull the text button's own inset flush left. */
+  margin-left: calc(var(--space-3) * -1);
+}
+
+.panelHint {
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-body-sm-size);
+  line-height: var(--md-body-sm-line);
+}
+
+/* The field itself is the SearchField primitive; here it only needs to take
+   whatever the action cluster leaves, down to a floor that still fits a
+   useful query. */
+.search {
+  flex: 1 1 240px;
+  min-width: 180px;
 }

@@ -1,11 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Button, Drawer, FormField, Input, Select } from '@/components/ui'
+import { Button, FormField, Modal, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { useAssetsQuery, useCreateAssetMutation, useUpdateAssetMutation } from '../api/assets.api'
 import { ASSET_STATUSES, ASSET_TYPES, type Asset, type AssetInput } from '../types'
-import styles from './AssetFormDrawer.module.css'
+import styles from './AssetFormModal.module.css'
 
-export interface AssetFormDrawerProps {
+export interface AssetFormModalProps {
   open: boolean
   /** null means "add"; an Asset means "edit" that asset. */
   asset: Asset | null
@@ -21,7 +21,7 @@ const EMPTY_FORM: AssetInput = {
   purchaseDate: '',
 }
 
-export function AssetFormDrawer({ open, asset, onClose }: AssetFormDrawerProps) {
+export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
   const [form, setForm] = useState<AssetInput>(EMPTY_FORM)
   const [error, setError] = useState('')
 
@@ -33,7 +33,7 @@ export function AssetFormDrawer({ open, asset, onClose }: AssetFormDrawerProps) 
   const isEditing = asset !== null
   const isSaving = createAsset.isPending || updateAsset.isPending
 
-  // The Drawer stays mounted (and slides off-screen via CSS) rather than
+  // The Modal stays mounted (and is hidden via CSS) rather than
   // unmounting when closed, so a `key`-based reset won't work here — this
   // effect is the pragmatic way to snap the form back to a clean state each
   // time it opens.
@@ -67,7 +67,7 @@ export function AssetFormDrawer({ open, asset, onClose }: AssetFormDrawerProps) 
   }
 
   return (
-    <Drawer
+    <Modal
       open={open}
       onClose={onClose}
       title={isEditing ? 'Edit asset' : 'Add asset'}
@@ -159,6 +159,6 @@ export function AssetFormDrawer({ open, asset, onClose }: AssetFormDrawerProps) 
           </FormField>
         </div>
       </form>
-    </Drawer>
+    </Modal>
   )
 }

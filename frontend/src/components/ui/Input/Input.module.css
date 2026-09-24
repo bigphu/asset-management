@@ -1,7 +1,9 @@
-/* M3 outlined text field. */
+/* M3 outlined text field at density -1 (48px). M3's default is 56px; the
+   comfortable size reads bulky in a dense admin tool, and this matches the
+   density the Table already uses. */
 .input {
   width: 100%;
-  height: 56px;
+  height: 40px;
   padding: 0 16px;
   border: 1px solid var(--md-outline);
   border-radius: var(--md-shape-xs);

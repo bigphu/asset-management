@@ -1,0 +1,35 @@
+/* Shared by ExportModal and ProfileFormModal. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.scopeNote {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+  border-radius: var(--radius-md);
+  padding: 11px 13px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+/* Matches FormField .label — it is a field label like its siblings, so the
+   all-caps micro-treatment made it read as a different kind of thing. */
+.sectionLabel {
+  font-size: var(--md-body-sm-size);
+  line-height: var(--md-body-sm-line);
+  letter-spacing: var(--md-body-sm-tracking);
+  font-weight: var(--md-body-sm-weight);
+  color: var(--md-on-surface-variant);
+  margin-bottom: 4px;
+}
+
+.saveRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+.saveRow > :first-child {
+  flex: 1;
+}

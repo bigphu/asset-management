@@ -9,12 +9,17 @@
   width: 100%;
   border-collapse: collapse;
   min-width: 820px;
+  /* Fixed layout so a consumer colgroup is authoritative. Without it, auto
+     layout spreads spare width across every column and they drift apart on a
+     wide window. With no colgroup the columns simply share the width evenly. */
+  table-layout: fixed;
 }
 
 .thead {
-  /* Deliberate deviation from M3, recorded in the spec: the dark header is a
-     brand decision. M3 would use a light surface with on-surface-variant labels. */
-  background: var(--md-inverse-surface);
+  /* M3 data-table header: a surface-container tint rather than a filled bar.
+     This replaces the earlier inverse-surface slab, which was the single
+     heaviest element on an otherwise light page. */
+  background: var(--md-surface-container);
 }
 
 .th {
@@ -22,7 +27,10 @@
   padding: 0 16px;
   text-align: left;
   text-transform: none;
-  color: var(--md-inverse-on-surface-variant);
+  /* on-surface, not on-surface-variant: the variant only reaches 4.39:1 against
+     surface-container, under the 4.5 floor. These labels are also the sort
+     controls, so they need to read as interactive. */
+  color: var(--md-on-surface);
   font-size: var(--md-label-lg-size);
   line-height: var(--md-label-lg-line);
   letter-spacing: var(--md-label-lg-tracking);
@@ -36,7 +44,7 @@
   user-select: none;
 }
 .sortable:hover {
-  color: var(--md-inverse-on-surface);
+  color: var(--md-primary);
 }
 
 .sortArrow {
@@ -47,7 +55,7 @@
 }
 .sortActive .sortArrow {
   opacity: 1;
-  color: var(--md-inverse-primary);
+  color: var(--md-primary);
 }
 
 .row {

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useAppSelector } from '@/app/store'
 import { useAssetsQuery } from '../api/assets.api'
-import type { Asset } from '../types'
+import type { Asset, FilterCondition } from '../types'
 
 export interface FilteredAssetsResult {
   isLoading: boolean
@@ -13,6 +13,31 @@ export interface FilteredAssetsResult {
   total: number
   pageCount: number
   locations: string[]
+}
+
+/**
+ * Rows without a value are still being edited and are skipped. Across fields
+ * the conditions AND together; within one field the "is" rows OR together
+ * (Status is In Use + Status is Under Repair = either), because ANDing two
+ * different values of one column could never match anything. "is not" rows
+ * always AND, so each one excludes its value.
+ */
+export function matchesConditions(asset: Asset, conditions: FilterCondition[]): boolean {
+  const anyOf = new Map<FilterCondition['field'], Set<string>>()
+  for (const c of conditions) {
+    if (!c.value) continue
+    if (c.operator === 'isNot') {
+      if (asset[c.field] === c.value) return false
+    } else {
+      const values = anyOf.get(c.field) ?? new Set<string>()
+      values.add(c.value)
+      anyOf.set(c.field, values)
+    }
+  }
+  for (const [field, values] of anyOf) {
+    if (!values.has(asset[field])) return false
+  }
+  return true
 }
 
 /**
@@ -34,9 +59,7 @@ export function useFilteredAssets(): FilteredAssetsResult {
   const filtered = useMemo(() => {
     const search = filters.search.trim().toLowerCase()
     const list = assets.filter((a) => {
-      if (filters.type && a.type !== filters.type) return false
-      if (filters.status && a.status !== filters.status) return false
-      if (filters.location && a.location !== filters.location) return false
+      if (!matchesConditions(a, filters.conditions)) return false
       if (
         search &&
         !a.tag.toLowerCase().includes(search) &&

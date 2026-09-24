@@ -1,0 +1,16 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: left;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.search {
+  flex: 1 1 240px;
+  min-width: 180px;
+  /* A profile name is short; past this the field is just empty outline. */
+  max-width: 420px;
+  /* margin-right: auto; */
+}

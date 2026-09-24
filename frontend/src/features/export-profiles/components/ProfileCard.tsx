@@ -1,4 +1,5 @@
-import { Card, IconButton, Button } from '@/components/ui'
+import { FileSpreadsheet, Pencil, Trash2 } from 'lucide-react'
+import { Badge, Button, Card, IconButton } from '@/components/ui'
 import type { ExportProfile } from '../types'
 import styles from './ProfileCard.module.css'
 
@@ -9,32 +10,40 @@ export interface ProfileCardProps {
 }
 
 export function ProfileCard({ profile, onEdit, onDelete }: ProfileCardProps) {
-  const includedCount = profile.columns.filter((c) => c.included).length
+  const included = profile.columns.filter((c) => c.included)
 
   return (
     <Card className={styles.card}>
-      <div className={styles.icon} aria-hidden="true">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      </div>
-      <div className={styles.main}>
-        <div className={styles.name}>{profile.name}</div>
-        <div className={styles.meta}>
-          {includedCount} column{includedCount === 1 ? '' : 's'} &middot; dates as{' '}
-          {profile.dateFormat}
+      <div className={styles.header}>
+        <div className={styles.icon} aria-hidden="true">
+          <FileSpreadsheet size={20} />
+        </div>
+        <div className={styles.main}>
+          <h2 className={styles.name}>{profile.name}</h2>
+          <p className={styles.meta}>
+            {included.length} of {profile.columns.length} columns &middot; dates as{' '}
+            {profile.dateFormat}
+          </p>
         </div>
       </div>
+
+      {/* The header row of the file this profile produces, in order. */}
+      <ol className={styles.columns} aria-label="Exported columns, in order">
+        {included.map((col) => (
+          <li key={col.key}>
+            <Badge shape="rect">{col.label}</Badge>
+          </li>
+        ))}
+      </ol>
+
       <div className={styles.actions}>
+        <IconButton danger aria-label={`Delete ${profile.name}`} onClick={onDelete}>
+          <Trash2 size={18} aria-hidden="true" />
+        </IconButton>
         <Button size="sm" variant="outline" onClick={onEdit}>
+          <Pencil size={16} aria-hidden="true" />
           Edit
         </Button>
-        <IconButton danger aria-label={`Delete ${profile.name}`} onClick={onDelete}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 6h18" />
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" />
-          </svg>
-        </IconButton>
       </div>
     </Card>
   )

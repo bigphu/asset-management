@@ -46,9 +46,10 @@ const CHECKS = [
   ['accent hover fill + contrast text', 'color-accent-contrast', 'color-accent-hover', 4.5],
   ['accent text on surface', 'color-accent', 'color-surface', 4.5],
   ['accent text on accent-soft', 'color-accent', 'color-accent-soft', 4.5],
-  ['table head label on inverse', 'color-inverse-text-muted', 'color-inverse-bg', 4.5],
-  ['table head hover on inverse', 'color-inverse-text', 'color-inverse-bg', 4.5],
-  ['sort arrow on inverse', 'color-accent-on-inverse', 'color-inverse-bg', 3.0],
+  // The inverse surface is the toast's now that the table header moved to
+  // surface-container; these pairings still ship, just somewhere else.
+  ['muted text on inverse', 'color-inverse-text-muted', 'color-inverse-bg', 4.5],
+  ['undo action on inverse', 'color-accent-on-inverse', 'color-inverse-bg', 3.0],
   ['toast text on inverse', 'color-inverse-text', 'color-inverse-bg', 4.5],
   ['chip icon on neutral', 'color-text-muted', 'color-status-neutral-bg', 3.0],
   ['status good pill', 'color-status-good-text', 'color-status-good-bg', 4.5],
@@ -69,6 +70,11 @@ const ROLE_CHECKS = [
   ['inverse-on-surface on inverse-surface', 'md-inverse-on-surface', 'md-inverse-surface', 4.5],
   ['inverse-primary on inverse-surface', 'md-inverse-primary', 'md-inverse-surface', 3.0],
   ['outline on surface', 'md-outline', 'md-surface', 3.0],
+  // Table header, which is surface-container. on-surface-variant is deliberately
+  // NOT used here: it only reaches 4.39:1 against that tint.
+  ['table head label on surface-container', 'md-on-surface', 'md-surface-container', 4.5],
+  ['table head hover on surface-container', 'md-primary', 'md-surface-container', 4.5],
+  ['sort arrow on surface-container', 'md-primary', 'md-surface-container', 3.0],
 ]
 
 // Composite states. These are NOT WCAG text gates: disabled controls are exempt

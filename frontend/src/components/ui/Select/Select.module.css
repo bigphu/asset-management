@@ -1,11 +1,20 @@
-/* M3 outlined text field with a trailing indicator. */
+/* M3 outlined text field with a trailing indicator, at density -1 (48px) to
+   match the Input primitive. */
 .select {
-  height: 56px;
+  height: 40px;
   min-width: 118px;
-  padding: 0 16px;
+  /* The native arrow sits at a fixed spot hugging the right border and ignores
+     padding, so draw our own chevron and place it 12px in. 40px of right
+     padding keeps a long value from running under it. */
+  appearance: none;
+  padding: 0 40px 0 16px;
   border: 1px solid var(--md-outline);
   border-radius: var(--md-shape-xs);
-  background: var(--md-surface);
+  background-color: var(--md-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 24px;
   color: var(--md-on-surface);
   font-size: var(--md-body-lg-size);
   line-height: var(--md-body-lg-line);
@@ -18,9 +27,18 @@
 }
 
 .select:focus {
-  border: 2px solid var(--md-primary);
-  padding: 0 15px;
+  /* border: 2px solid var(--md-primary); */
+  /* -1px each side so the value does not shift when the outline thickens. */
+  background-color: var(--md-surface-container);
   outline: none;
+}
+
+/* Chrome and Edge on Windows paint the open list with the select's own
+   background, which is surface-container while focused. Pin the options to
+   white. (macOS and Safari draw the list natively and ignore this.) */
+.select option {
+  background-color: var(--md-surface);
+  color: var(--md-on-surface);
 }
 
 .select:disabled {

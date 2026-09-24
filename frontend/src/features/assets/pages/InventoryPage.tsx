@@ -4,11 +4,11 @@ import { useToast } from '@/components/ui/Toast'
 import { useAppSelector } from '@/app/store'
 // Cross-feature import through export-profiles' public barrel only — see
 // that feature's index.ts. Never reach into '@/features/export-profiles/...'.
-import { ExportDrawer } from '@/features/export-profiles'
+import { ExportModal } from '@/features/export-profiles'
 import { useDeleteAssetMutation, useRestoreAssetMutation } from '../api/assets.api'
 import { useFilteredAssets } from '../hooks/useFilteredAssets'
 import type { Asset } from '../types'
-import { AssetFormDrawer } from '../components/AssetFormDrawer'
+import { AssetFormModal } from '../components/AssetFormModal'
 import { AssetTable } from '../components/AssetTable'
 import { AssetToolbar } from '../components/AssetToolbar'
 
@@ -47,12 +47,18 @@ export function InventoryPage() {
 
   return (
     <>
+      {/* Actions live in the toolbar, next to search and filters — the
+          Cloudflare-dashboard pattern — so the header is title only. */}
       <PageHeader
         title="Inventory"
         subtitle="Everything the company owns, where it lives, and what condition it's in."
       />
 
-      <AssetToolbar locations={locations} onAddAsset={handleAdd} onExport={() => setExportOpen(true)} />
+      <AssetToolbar
+        locations={locations}
+        onExport={() => setExportOpen(true)}
+        onAdd={handleAdd}
+      />
 
       <AssetTable
         pageItems={pageItems}
@@ -66,8 +72,8 @@ export function InventoryPage() {
         onDelete={handleDelete}
       />
 
-      <AssetFormDrawer open={formOpen} asset={formAsset} onClose={() => setFormOpen(false)} />
-      <ExportDrawer open={exportOpen} onClose={() => setExportOpen(false)} scopeCount={total} />
+      <AssetFormModal open={formOpen} asset={formAsset} onClose={() => setFormOpen(false)} />
+      <ExportModal open={exportOpen} onClose={() => setExportOpen(false)} scopeCount={total} />
     </>
   )
 }

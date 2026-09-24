@@ -1,5 +1,6 @@
 import { createSlice, nanoid, type PayloadAction } from '@reduxjs/toolkit'
 import { FILTER_FIELDS, type AssetFilters, type AssetSort, type FilterCondition } from '../types'
+import { loadPageSize } from './pageSizePreference'
 
 export interface AssetsUiState {
   filters: AssetFilters
@@ -12,7 +13,8 @@ const initialState: AssetsUiState = {
   filters: { search: '', conditions: [] },
   sort: { key: 'tag', direction: 'asc' },
   page: 1,
-  pageSize: 10,
+  // The viewer's last rows-per-page choice; saved by the table's selector.
+  pageSize: loadPageSize(),
 }
 
 const assetsUiSlice = createSlice({

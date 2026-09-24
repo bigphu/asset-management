@@ -7,21 +7,21 @@ import { useAppSelector } from '@/app/store'
 // that feature's index.ts. Never reach into '@/features/export-profiles/...'.
 import { ExportModal, type ExportScope } from '@/features/export-profiles'
 import { useDeleteAssetMutation, useRestoreAssetMutation } from '../api/assets.api'
-import { toApiFilters, useFilteredAssets } from '../hooks/useFilteredAssets'
+import { useAssetPage } from '../hooks/useAssetPage'
 import type { Asset } from '../types'
 import { AssetFormModal } from '../components/AssetFormModal'
 import { AssetTable } from '../components/AssetTable'
 import { AssetToolbar } from '../components/AssetToolbar'
 
 export function InventoryPage() {
-  const { pageSize, filters, sort } = useAppSelector((state) => state.assetsUi)
-  const { isLoading, isError, pageItems, total, pageCount } = useFilteredAssets()
+  const sort = useAppSelector((state) => state.assetsUi.sort)
+  const assetPage = useAssetPage()
 
-  // The export re-runs the list's query on the server (ADR-0008), so it gets
-  // the same filters and sort the table is showing.
+  // The export re-runs the list's query without paging (ADR-0008), so it
+  // gets exactly the filters and sort the shown rows were fetched with.
   const exportScope = useMemo<ExportScope>(
-    () => ({ filters: toApiFilters(filters), sort }),
-    [filters, sort],
+    () => ({ filters: assetPage.apiFilters, sort }),
+    [assetPage.apiFilters, sort],
   )
 
   const deleteAsset = useDeleteAssetMutation()
@@ -31,8 +31,6 @@ export function InventoryPage() {
   const [formAsset, setFormAsset] = useState<Asset | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
-
-  const page = useAppSelector((state) => Math.min(state.assetsUi.page, pageCount))
 
   function handleAdd() {
     setFormAsset(null)
@@ -67,13 +65,15 @@ export function InventoryPage() {
       <AssetToolbar onExport={() => setExportOpen(true)} onAdd={handleAdd} />
 
       <AssetTable
-        pageItems={pageItems}
-        total={total}
-        page={page}
-        pageSize={pageSize}
-        pageCount={pageCount}
-        isLoading={isLoading}
-        isError={isError}
+        pageItems={assetPage.items}
+        total={assetPage.total}
+        firstRow={assetPage.firstRow}
+        page={assetPage.page}
+        pageSize={assetPage.pageSize}
+        pageCount={assetPage.pageCount}
+        isLoading={assetPage.isLoading}
+        isFetching={assetPage.isFetching}
+        isError={assetPage.isError}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
@@ -82,7 +82,7 @@ export function InventoryPage() {
       <ExportModal
         open={exportOpen}
         onClose={() => setExportOpen(false)}
-        scopeCount={total}
+        scopeCount={assetPage.total}
         scope={exportScope}
       />
     </>

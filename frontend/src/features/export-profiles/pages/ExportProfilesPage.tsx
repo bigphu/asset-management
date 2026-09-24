@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button, PageHeader, SearchField } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { describeError } from '@/lib/apiClient'
 import { useAppDispatch, useAppSelector } from '@/app/store'
 import {
   useCreateProfileMutation,
@@ -31,18 +32,25 @@ export function ExportProfilesPage() {
     : profiles
 
   function handleDelete(profile: ExportProfile) {
+    const onError = (error: Error) => toast.show(describeError(error))
     deleteProfile.mutate(profile.id, {
       onSuccess: () =>
         toast.show(`Deleted profile "${profile.name}".`, {
           undo: {
+            // Profiles are hard-deleted (ADR-0013), so undo re-creates it
+            // under a new id from the copy held here.
             onUndo: () =>
-              createProfile.mutate({
-                name: profile.name,
-                dateFormat: profile.dateFormat,
-                columns: profile.columns,
-              }),
+              createProfile.mutate(
+                {
+                  name: profile.name,
+                  dateFormat: profile.dateFormat,
+                  columns: profile.columns,
+                },
+                { onError },
+              ),
           },
         }),
+      onError,
     })
   }
 

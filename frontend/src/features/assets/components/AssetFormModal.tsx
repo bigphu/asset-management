@@ -1,8 +1,14 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Button, FormField, Modal, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
-import { useAssetsQuery, useCreateAssetMutation, useUpdateAssetMutation } from '../api/assets.api'
-import { ASSET_STATUSES, ASSET_TYPES, type Asset, type AssetInput } from '../types'
+import { describeError } from '@/lib/apiClient'
+import {
+  useAssetsQuery,
+  useCreateAssetMutation,
+  useReferenceDataQuery,
+  useUpdateAssetMutation,
+} from '../api/assets.api'
+import type { Asset, AssetInput, ReferenceItem } from '../types'
 import styles from './AssetFormModal.module.css'
 
 export interface AssetFormModalProps {
@@ -15,10 +21,32 @@ export interface AssetFormModalProps {
 const EMPTY_FORM: AssetInput = {
   tag: '',
   name: '',
-  type: ASSET_TYPES[0],
-  status: ASSET_STATUSES[0],
+  type: '',
+  status: '',
   location: '',
   purchaseDate: '',
+  notes: null,
+}
+
+/** The editable fields of an asset — the API rejects unknown fields such as `id` or `typeName`. */
+function toInput(asset: Asset): AssetInput {
+  const { tag, name, type, status, location, purchaseDate, notes } = asset
+  return { tag, name, type, status, location, purchaseDate, notes }
+}
+
+function ReferenceOptions({ items }: { items: ReferenceItem[] | undefined }) {
+  return (
+    <>
+      <option value="" disabled>
+        {items ? 'Select…' : 'Loading…'}
+      </option>
+      {items?.map((item) => (
+        <option key={item.code} value={item.code}>
+          {item.name}
+        </option>
+      ))}
+    </>
+  )
 }
 
 export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
@@ -26,6 +54,7 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
   const [error, setError] = useState('')
 
   const { data: assets = [] } = useAssetsQuery()
+  const { data: referenceData } = useReferenceDataQuery()
   const createAsset = useCreateAssetMutation()
   const updateAsset = useUpdateAssetMutation()
   const toast = useToast()
@@ -40,29 +69,33 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
   useEffect(() => {
     if (!open) return
     setError('')
-    setForm(asset ? { ...asset } : EMPTY_FORM)
+    setForm(asset ? toInput(asset) : EMPTY_FORM)
   }, [open, asset])
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
+    // Fast feedback from the loaded list; the server's unique constraint is
+    // the real check (and also covers tags held by deleted assets).
     const duplicate = assets.some(
-      (a) => a.tag.toLowerCase() === form.tag.toLowerCase() && a.id !== asset?.id,
+      (a) => a.tag.toLowerCase() === form.tag.trim().toLowerCase() && a.id !== asset?.id,
     )
     if (duplicate) {
       setError(`Asset tag "${form.tag}" is already in use. Choose a unique tag.`)
       return
     }
 
+    setError('')
     const onSuccess = () => {
       toast.show(isEditing ? `Saved changes to ${form.tag}.` : `Added ${form.tag} to the inventory.`)
       onClose()
     }
+    const onError = (err: Error) => setError(describeError(err))
 
     if (isEditing) {
-      updateAsset.mutate({ id: asset.id, input: form }, { onSuccess })
+      updateAsset.mutate({ id: asset.id, input: form }, { onSuccess, onError })
     } else {
-      createAsset.mutate(form, { onSuccess })
+      createAsset.mutate(form, { onSuccess, onError })
     }
   }
 
@@ -84,14 +117,27 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
       }
     >
       <form id="asset-form" onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
+        {error && (
+          <div className={styles.error} role="alert">
+            {error}
+          </div>
+        )}
 
-        <FormField label="Asset tag" htmlFor="f-tag" hint="Must be unique across the inventory.">
+        <FormField
+          label="Asset tag"
+          htmlFor="f-tag"
+          hint={
+            isEditing
+              ? "A tag can't be changed once the asset exists."
+              : 'Must be unique across the inventory, and cannot be changed later.'
+          }
+        >
           <Input
             id="f-tag"
             className={styles.mono}
             placeholder="e.g. LAP-1005"
             required
+            readOnly={isEditing}
             value={form.tag}
             onChange={(e) => setForm({ ...form, tag: e.target.value })}
           />
@@ -113,13 +159,9 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
               id="f-type"
               required
               value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value as AssetInput['type'] })}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
             >
-              {ASSET_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              <ReferenceOptions items={referenceData?.types} />
             </Select>
           </FormField>
           <FormField label="Status" htmlFor="f-status">
@@ -127,13 +169,9 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
               id="f-status"
               required
               value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value as AssetInput['status'] })}
+              onChange={(e) => setForm({ ...form, status: e.target.value })}
             >
-              {ASSET_STATUSES.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
+              <ReferenceOptions items={referenceData?.statuses} />
             </Select>
           </FormField>
         </div>
@@ -149,13 +187,14 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
             />
           </FormField>
           <FormField label="Location" htmlFor="f-location">
-            <Input
+            <Select
               id="f-location"
-              placeholder="e.g. HQ – 2F – Rm 204"
               required
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
-            />
+            >
+              <ReferenceOptions items={referenceData?.locations} />
+            </Select>
           </FormField>
         </div>
       </form>

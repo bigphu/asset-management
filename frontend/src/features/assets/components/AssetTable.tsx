@@ -1,42 +1,30 @@
 import {
-  Armchair,
-  Car,
   Computer,
   Laptop,
   Monitor,
   Package,
   Printer,
-  Projector,
   Router,
-  Server,
   Smartphone,
-  Table2,
-  Tablet,
   type LucideIcon,
 } from 'lucide-react'
 import { Checkbox, EmptyState, Menu, Pagination, Table } from '@/components/ui'
 import { formatDateDisplay } from '@/utils/formatDate'
 import { useAppDispatch, useAppSelector } from '@/app/store'
 import { clearFilters, setPage, setSort } from '../store/assetsUiSlice'
-import type { Asset, AssetSort, AssetType } from '../types'
+import type { Asset, AssetSort } from '../types'
 import { StatusBadge } from './StatusBadge'
 import styles from './AssetTable.module.css'
 
-/** Typed as a full Record so adding an AssetType fails the build rather than
- *  silently falling through to the generic box. */
-const ASSET_ICONS: Record<AssetType, LucideIcon> = {
-  Laptop,
-  Desktop: Computer,
-  Monitor,
-  Tablet,
-  Phone: Smartphone,
-  Printer,
-  Server,
-  Router,
-  Projector,
-  Desk: Table2,
-  Chair: Armchair,
-  Vehicle: Car,
+/** Icon per asset type code (seeded in backend/db/init/002_seed.sql). Types
+ *  are reference data, so a code added later falls back to the generic box. */
+const ASSET_ICONS: Record<string, LucideIcon> = {
+  LAPTOP: Laptop,
+  DESKTOP: Computer,
+  MONITOR: Monitor,
+  PRINTER: Printer,
+  NETWORK_DEVICE: Router,
+  MOBILE_DEVICE: Smartphone,
 }
 
 const COLUMNS: { key: AssetSort['key']; label: string }[] = [
@@ -164,11 +152,11 @@ export function AssetTable({
                         </div>
                       </div>
                     </Table.Cell>
-                    <Table.Cell className={styles.typeText}>{asset.type}</Table.Cell>
+                    <Table.Cell className={styles.typeText}>{asset.typeName}</Table.Cell>
                     <Table.Cell>
-                      <StatusBadge status={asset.status} />
+                      <StatusBadge status={asset.status} label={asset.statusName} />
                     </Table.Cell>
-                    <Table.Cell className={styles.ellipsis}>{asset.location}</Table.Cell>
+                    <Table.Cell className={styles.ellipsis}>{asset.locationName}</Table.Cell>
                     <Table.Cell className={styles.numeric}>
                       {formatDateDisplay(asset.purchaseDate)}
                     </Table.Cell>

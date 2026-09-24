@@ -1,45 +1,40 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Asset, AssetInput } from '../types'
-import { mockAssets } from './mockAssets'
+import { apiClient, type Page } from '@/lib/apiClient'
+import type { Asset, AssetInput, ReferenceData } from '../types'
 
 // ---------------------------------------------------------------------------
-// Mock "backend". Replace the bodies of the five functions below with
-// `apiClient` calls once the real endpoint exists — the query/mutation hooks
-// underneath don't need to change.
+// Backend calls. Contract: backend/api/routes/assets.js, browsable at /api/docs.
 // ---------------------------------------------------------------------------
 
-const deletedTags = new Set<string>()
+/** The API's maximum page size (backend/api/dto/assets.dto.js). */
+const MAX_PAGE_SIZE = 500
 
-function delay<T>(value: T, ms = 300): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms))
-}
-
+/**
+ * Loads every asset, following pages. The table filters, sorts and pages on
+ * the client (`useFilteredAssets`), which suits hundreds of rows; if the
+ * inventory grows well past that, move paging server-side (ADR-0003) by
+ * sending the filters as query params and keying the query on them.
+ */
 async function fetchAssets(): Promise<Asset[]> {
-  return delay(mockAssets.filter((a) => !deletedTags.has(a.tag)))
+  const items: Asset[] = []
+  for (let page = 1; ; page++) {
+    const res = await apiClient.get<Page<Asset>>('/assets', { page, pageSize: MAX_PAGE_SIZE })
+    items.push(...res.items)
+    if (res.items.length === 0 || items.length >= res.total) return items
+  }
 }
 
-async function createAsset(input: AssetInput): Promise<Asset> {
-  const created: Asset = { id: input.tag, ...input }
-  mockAssets.push(created)
-  return delay(created)
-}
+const createAsset = (input: AssetInput) => apiClient.post<Asset>('/assets', input)
 
-async function updateAsset(id: string, input: AssetInput): Promise<Asset> {
-  const index = mockAssets.findIndex((a) => a.id === id)
-  const updated: Asset = { id: input.tag, ...input }
-  if (index !== -1) mockAssets[index] = updated
-  return delay(updated)
-}
+const updateAsset = (id: string, input: AssetInput) =>
+  apiClient.put<Asset>(`/assets/${encodeURIComponent(id)}`, input)
 
-async function deleteAsset(tag: string): Promise<void> {
-  deletedTags.add(tag)
-  return delay(undefined)
-}
+/** Soft delete (ADR-0002) — reversible with `restoreAsset`. */
+const deleteAsset = (id: string) => apiClient.delete(`/assets/${encodeURIComponent(id)}`)
 
-async function restoreAsset(tag: string): Promise<void> {
-  deletedTags.delete(tag)
-  return delay(undefined)
-}
+const restoreAsset = (id: string) => apiClient.post<Asset>(`/assets/${encodeURIComponent(id)}/restore`)
+
+const fetchReferenceData = () => apiClient.get<ReferenceData>('/reference-data')
 
 // ---------------------------------------------------------------------------
 // Query keys — one factory so every hook and invalidation call agrees on shape.
@@ -48,6 +43,7 @@ async function restoreAsset(tag: string): Promise<void> {
 export const assetKeys = {
   all: ['assets'] as const,
   lists: () => [...assetKeys.all, 'list'] as const,
+  referenceData: () => ['reference-data'] as const,
 }
 
 // ---------------------------------------------------------------------------
@@ -58,6 +54,15 @@ export function useAssetsQuery() {
   return useQuery({
     queryKey: assetKeys.lists(),
     queryFn: fetchAssets,
+  })
+}
+
+/** Codes and display names for the type/status/location pickers; changes rarely. */
+export function useReferenceDataQuery() {
+  return useQuery({
+    queryKey: assetKeys.referenceData(),
+    queryFn: fetchReferenceData,
+    staleTime: 5 * 60_000,
   })
 }
 
@@ -80,7 +85,7 @@ export function useUpdateAssetMutation() {
 export function useDeleteAssetMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (tag: string) => deleteAsset(tag),
+    mutationFn: (id: string) => deleteAsset(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: assetKeys.lists() }),
   })
 }
@@ -88,7 +93,7 @@ export function useDeleteAssetMutation() {
 export function useRestoreAssetMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (tag: string) => restoreAsset(tag),
+    mutationFn: (id: string) => restoreAsset(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: assetKeys.lists() }),
   })
 }

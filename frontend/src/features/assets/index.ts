@@ -5,5 +5,11 @@
  * `./store` instead (see that folder's index.ts for why).
  */
 export { InventoryPage } from './pages/InventoryPage'
-export { ASSET_TYPES, ASSET_STATUSES } from './types'
-export type { Asset, AssetInput, AssetType, AssetStatus, AssetFilters, AssetSort } from './types'
+export type {
+  Asset,
+  AssetInput,
+  AssetFilters,
+  AssetSort,
+  ReferenceData,
+  ReferenceItem,
+} from './types'

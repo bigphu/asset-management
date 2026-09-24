@@ -7,4 +7,10 @@
  */
 export { ExportProfilesPage } from './pages/ExportProfilesPage'
 export { ExportModal } from './components/ExportModal'
-export type { ExportProfile, ExportColumn, ExportDateFormat, ExportableField } from './types'
+export type {
+  ExportProfile,
+  ExportColumn,
+  ExportDateFormat,
+  ExportableField,
+  ExportScope,
+} from './types'

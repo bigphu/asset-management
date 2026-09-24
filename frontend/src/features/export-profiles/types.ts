@@ -20,6 +20,24 @@ export interface ExportProfile {
 
 export type ExportProfileInput = Omit<ExportProfile, 'id'>
 
+/**
+ * Which rows an export contains and in what order: the Inventory list's
+ * current filters and sort, in the API's parameter form (ADR-0008). The
+ * assets feature builds it (`toExportScope`); this feature only forwards it.
+ */
+export interface ExportScope {
+  filters: {
+    search?: string
+    type?: string[]
+    typeNot?: string[]
+    status?: string[]
+    statusNot?: string[]
+    location?: string[]
+    locationNot?: string[]
+  }
+  sort: { key: string; direction: 'asc' | 'desc' }
+}
+
 export const DEFAULT_EXPORT_COLUMNS: ExportColumn[] = [
   { key: 'tag', label: 'Tag', included: true },
   { key: 'name', label: 'Name', included: true },

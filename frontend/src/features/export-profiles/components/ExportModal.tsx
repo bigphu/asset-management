@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Button, FormField, Modal, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { describeError } from '@/lib/apiClient'
+import { useExportAssetsMutation } from '../api/exports.api'
 import { useCreateProfileMutation, useProfilesQuery } from '../api/profiles.api'
 import { useExportColumns } from '../hooks/useExportColumns'
-import { DEFAULT_EXPORT_COLUMNS, type ExportDateFormat } from '../types'
+import { DEFAULT_EXPORT_COLUMNS, type ExportDateFormat, type ExportScope } from '../types'
 import { ColumnEditor } from './ColumnEditor'
 import styles from './ExportModal.module.css'
 
@@ -12,12 +14,15 @@ export interface ExportModalProps {
   onClose: () => void
   /** Row count the export will contain — every asset matching the current filters (ADR-0008). */
   scopeCount: number
+  /** The list's current filters and sort; the server re-applies them to build the file. */
+  scope: ExportScope
 }
 
 /** The "Export to Excel" dialog opened from the Inventory page (S-03 / S-04). */
-export function ExportModal({ open, onClose, scopeCount }: ExportModalProps) {
+export function ExportModal({ open, onClose, scopeCount, scope }: ExportModalProps) {
   const { data: profiles = [] } = useProfilesQuery()
   const createProfile = useCreateProfileMutation()
+  const exportAssets = useExportAssetsMutation()
   const toast = useToast()
 
   const [profileId, setProfileId] = useState('')
@@ -55,7 +60,10 @@ export function ExportModal({ open, onClose, scopeCount }: ExportModalProps) {
     }
     createProfile.mutate(
       { name: profileName.trim(), dateFormat, columns },
-      { onSuccess: () => toast.show(`Saved profile "${profileName.trim()}".`) },
+      {
+        onSuccess: () => toast.show(`Saved profile "${profileName.trim()}".`),
+        onError: (error) => toast.show(describeError(error)),
+      },
     )
   }
 
@@ -64,9 +72,16 @@ export function ExportModal({ open, onClose, scopeCount }: ExportModalProps) {
       toast.show('Pick at least one column to export.')
       return
     }
-    const filename = `inventory-export-${new Date().toISOString().slice(0, 10)}.xlsx`
-    onClose()
-    toast.show(`Exported ${scopeCount} row${scopeCount === 1 ? '' : 's'} to ${filename}`)
+    exportAssets.mutate(
+      { ...scope, columns, dateFormat },
+      {
+        onSuccess: ({ filename, rowCount }) => {
+          onClose()
+          toast.show(`Exported ${rowCount} row${rowCount === 1 ? '' : 's'} to ${filename}`)
+        },
+        onError: (error) => toast.show(`Export failed: ${describeError(error)}`),
+      },
+    )
   }
 
   return (
@@ -81,8 +96,8 @@ export function ExportModal({ open, onClose, scopeCount }: ExportModalProps) {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleExport}>
-            Export rows
+          <Button variant="primary" onClick={handleExport} disabled={exportAssets.isPending}>
+            {exportAssets.isPending ? 'Exporting…' : 'Export rows'}
           </Button>
         </>
       }

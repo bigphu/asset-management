@@ -13,11 +13,11 @@ so that I can find an asset without scrolling past hundreds of rows.
 
 ## Acceptance criteria
 
-- [ ] Table view with sortable columns
-- [ ] Filter by type, status and location
-- [ ] Free-text search on asset tag and name
-- [ ] Page size selectable; current page and total count shown
-- [ ] Filters survive a page reload
+- [x] Table view with sortable columns
+- [x] Filter by type, status and location
+- [x] Free-text search on asset tag and name
+- [x] Page size selectable; current page and total count shown
+- [x] Filters survive a page reload
 
 ## Out of scope
 

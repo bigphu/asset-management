@@ -3,7 +3,6 @@ import { Button, FormField, Modal, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { describeError } from '@/lib/apiClient'
 import {
-  useAssetsQuery,
   useCreateAssetMutation,
   useReferenceDataQuery,
   useUpdateAssetMutation,
@@ -53,7 +52,6 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
   const [form, setForm] = useState<AssetInput>(EMPTY_FORM)
   const [error, setError] = useState('')
 
-  const { data: assets = [] } = useAssetsQuery()
   const { data: referenceData } = useReferenceDataQuery()
   const createAsset = useCreateAssetMutation()
   const updateAsset = useUpdateAssetMutation()
@@ -75,16 +73,8 @@ export function AssetFormModal({ open, asset, onClose }: AssetFormModalProps) {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
-    // Fast feedback from the loaded list; the server's unique constraint is
-    // the real check (and also covers tags held by deleted assets).
-    const duplicate = assets.some(
-      (a) => a.tag.toLowerCase() === form.tag.trim().toLowerCase() && a.id !== asset?.id,
-    )
-    if (duplicate) {
-      setError(`Asset tag "${form.tag}" is already in use. Choose a unique tag.`)
-      return
-    }
-
+    // Tag uniqueness is checked by the server (only one page of assets is
+    // loaded here); a duplicate comes back as DUPLICATE_TAG and shows below.
     setError('')
     const onSuccess = () => {
       toast.show(isEditing ? `Saved changes to ${form.tag}.` : `Added ${form.tag} to the inventory.`)

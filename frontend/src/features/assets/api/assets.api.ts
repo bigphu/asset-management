@@ -1,28 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient, type Page } from '@/lib/apiClient'
-import type { Asset, AssetInput, ReferenceData } from '../types'
+import type { Asset, AssetInput, AssetListParams, ReferenceData } from '../types'
 
 // ---------------------------------------------------------------------------
 // Backend calls. Contract: backend/api/routes/assets.js, browsable at /api/docs.
 // ---------------------------------------------------------------------------
 
-/** The API's maximum page size (backend/api/dto/assets.dto.js). */
-const MAX_PAGE_SIZE = 500
-
 /**
- * Loads every asset, following pages. The table filters, sorts and pages on
- * the client (`useFilteredAssets`), which suits hundreds of rows; if the
- * inventory grows well past that, move paging server-side (ADR-0003) by
- * sending the filters as query params and keying the query on them.
+ * One page of the list, filtered and sorted on the server (ADR-0003: offset/
+ * limit with a total count). Array filter values repeat their key, which the
+ * API reads as "any of".
  */
-async function fetchAssets(): Promise<Asset[]> {
-  const items: Asset[] = []
-  for (let page = 1; ; page++) {
-    const res = await apiClient.get<Page<Asset>>('/assets', { page, pageSize: MAX_PAGE_SIZE })
-    items.push(...res.items)
-    if (res.items.length === 0 || items.length >= res.total) return items
-  }
-}
+const fetchAssetPage = (params: AssetListParams) => apiClient.get<Page<Asset>>('/assets', params)
 
 const createAsset = (input: AssetInput) => apiClient.post<Asset>('/assets', input)
 
@@ -43,6 +32,7 @@ const fetchReferenceData = () => apiClient.get<ReferenceData>('/reference-data')
 export const assetKeys = {
   all: ['assets'] as const,
   lists: () => [...assetKeys.all, 'list'] as const,
+  list: (params: AssetListParams) => [...assetKeys.lists(), params] as const,
   referenceData: () => ['reference-data'] as const,
 }
 
@@ -50,10 +40,13 @@ export const assetKeys = {
 // Public hooks — this is what feature components import.
 // ---------------------------------------------------------------------------
 
-export function useAssetsQuery() {
+export function useAssetsQuery(params: AssetListParams) {
   return useQuery({
-    queryKey: assetKeys.lists(),
-    queryFn: fetchAssets,
+    queryKey: assetKeys.list(params),
+    queryFn: () => fetchAssetPage(params),
+    // Keep showing the current page while the next one loads, instead of
+    // flashing the loading state on every page, sort or filter change.
+    placeholderData: keepPreviousData,
   })
 }
 

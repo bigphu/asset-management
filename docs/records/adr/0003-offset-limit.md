@@ -50,4 +50,6 @@ where offsets become slow.
 
 ## Implementation
 
-Not implemented yet. The backend is still the Express generator scaffold, with no database chosen.
+- API: `GET /api/assets?page&pageSize&sort&direction&search&type&typeNot&status&statusNot&location&locationNot` returns `{ items, total, page, pageSize }` (`backend/api/routes/assets.js`, `backend/repositories/assets.repo.js`). A count query runs beside the page query; `pageSize` is capped at 500; ties break on tag then id so pages stay stable.
+- UI: the Inventory table requests one page at a time (`frontend/src/features/assets/hooks/useAssetPage.ts`), with a rows-per-page selector (10/25/50/100, remembered per browser) and windowed page buttons.
+- The query-string consequence holds: search, filters, sort, page and a non-default page size are mirrored into the page URL (`frontend/src/features/assets/store/listUrl.ts`), so they survive a reload and can be shared as a link, using the API's own parameter names.

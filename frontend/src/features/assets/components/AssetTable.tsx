@@ -8,10 +8,11 @@ import {
   Smartphone,
   type LucideIcon,
 } from 'lucide-react'
-import { Checkbox, EmptyState, Menu, Pagination, Table } from '@/components/ui'
+import { Checkbox, EmptyState, Menu, Pagination, Select, Table } from '@/components/ui'
 import { formatDateDisplay } from '@/utils/formatDate'
 import { useAppDispatch, useAppSelector } from '@/app/store'
-import { clearFilters, setPage, setSort } from '../store/assetsUiSlice'
+import { clearFilters, setPage, setPageSize, setSort } from '../store/assetsUiSlice'
+import { PAGE_SIZE_OPTIONS, savePageSize } from '../store/pageSizePreference'
 import type { Asset, AssetSort } from '../types'
 import { StatusBadge } from './StatusBadge'
 import styles from './AssetTable.module.css'
@@ -38,10 +39,14 @@ const COLUMNS: { key: AssetSort['key']; label: string }[] = [
 export interface AssetTableProps {
   pageItems: Asset[]
   total: number
+  /** 1-based index of `pageItems[0]` in the full result. */
+  firstRow: number
   page: number
   pageSize: number
   pageCount: number
   isLoading: boolean
+  /** Another page is loading; the current rows stay visible, marked busy. */
+  isFetching: boolean
   isError: boolean
   onEdit: (asset: Asset) => void
   onDelete: (asset: Asset) => void
@@ -50,10 +55,12 @@ export interface AssetTableProps {
 export function AssetTable({
   pageItems,
   total,
+  firstRow,
   page,
   pageSize,
   pageCount,
   isLoading,
+  isFetching,
   isError,
   onEdit,
   onDelete,
@@ -64,7 +71,7 @@ export function AssetTable({
   return (
     <>
       <Table.Container>
-        <Table.Root>
+        <Table.Root aria-busy={isFetching} className={isFetching ? styles.fetching : undefined}>
           {/* Fixed layout plus these widths is what stops the columns drifting
               apart on a wide window: every other column is pinned, so Asset —
               the only unsized column — absorbs all the slack. */}
@@ -188,13 +195,31 @@ export function AssetTable({
         <span className={styles.tabular}>
           {total === 0
             ? 'No assets found'
-            : (() => {
-                const start = (page - 1) * pageSize + 1
-                const end = start + pageItems.length - 1
-                return `Showing ${start}–${end} of ${total} asset${total === 1 ? '' : 's'}`
-              })()}
+            : `Showing ${firstRow}–${firstRow + pageItems.length - 1} of ${total} asset${
+                total === 1 ? '' : 's'
+              }`}
         </span>
-        <Pagination page={page} pageCount={pageCount} onPageChange={(p) => dispatch(setPage(p))} />
+        <div className={styles.pager}>
+          <label className={styles.pageSize}>
+            Rows per page
+            <Select
+              className={styles.pageSizeSelect}
+              value={pageSize}
+              onChange={(e) => {
+                const size = Number(e.target.value)
+                dispatch(setPageSize(size))
+                savePageSize(size)
+              }}
+            >
+              {PAGE_SIZE_OPTIONS.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </Select>
+          </label>
+          <Pagination page={page} pageCount={pageCount} onPageChange={(p) => dispatch(setPage(p))} />
+        </div>
       </div>
     </>
   )

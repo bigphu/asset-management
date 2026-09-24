@@ -45,10 +45,36 @@ export interface AssetInput {
   notes: string | null
 }
 
+/**
+ * GET /api/assets query (ADR-0003). Filter arrays repeat their key
+ * (`type=A&type=B`, "any of"); `…Not` keys exclude. See `toApiFilters`.
+ */
+// `type`, not `interface`: only type aliases satisfy apiClient's QueryParams index signature.
+export type AssetListParams = ApiAssetFilters & {
+  page: number
+  pageSize: number
+  sort: AssetSort['key']
+  direction: SortDirection
+}
+
+/** The list's filters in API form — shared by the list query and the export (ADR-0008). */
+export type ApiAssetFilters = {
+  search?: string
+  type?: string[]
+  typeNot?: string[]
+  status?: string[]
+  statusNot?: string[]
+  location?: string[]
+  locationNot?: string[]
+}
+
 export type SortDirection = 'asc' | 'desc'
 
+/** Columns the table sorts by (a subset of what the API accepts). */
+export const SORT_KEYS = ['tag', 'name', 'type', 'status', 'location', 'purchaseDate'] as const
+
 export interface AssetSort {
-  key: keyof Pick<Asset, 'tag' | 'name' | 'type' | 'status' | 'location' | 'purchaseDate'>
+  key: (typeof SORT_KEYS)[number]
   direction: SortDirection
 }
 

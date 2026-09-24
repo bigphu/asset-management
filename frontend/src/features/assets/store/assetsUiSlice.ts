@@ -1,5 +1,7 @@
 import { createSlice, nanoid, type PayloadAction } from '@reduxjs/toolkit'
 import { FILTER_FIELDS, type AssetFilters, type AssetSort, type FilterCondition } from '../types'
+import type { ListUrlState } from './listUrl'
+import { loadPageSize } from './pageSizePreference'
 
 export interface AssetsUiState {
   filters: AssetFilters
@@ -12,7 +14,8 @@ const initialState: AssetsUiState = {
   filters: { search: '', conditions: [] },
   sort: { key: 'tag', direction: 'asc' },
   page: 1,
-  pageSize: 10,
+  // The viewer's last rows-per-page choice; saved by the table's selector.
+  pageSize: loadPageSize(),
 }
 
 const assetsUiSlice = createSlice({
@@ -76,6 +79,21 @@ const assetsUiSlice = createSlice({
       state.pageSize = action.payload
       state.page = 1
     },
+    /** Replaces the list state with what a URL described (see listUrl.ts). */
+    hydrateList: {
+      reducer(state, action: PayloadAction<ListUrlState & { conditions: FilterCondition[] }>) {
+        const { search, conditions, sort, page, pageSize } = action.payload
+        state.filters = { search, conditions }
+        state.sort = sort
+        state.page = page
+        if (pageSize) state.pageSize = pageSize
+      },
+      prepare(list: ListUrlState) {
+        return {
+          payload: { ...list, conditions: list.conditions.map((c) => ({ ...c, id: nanoid() })) },
+        }
+      },
+    },
   },
 })
 
@@ -89,5 +107,6 @@ export const {
   setSort,
   setPage,
   setPageSize,
+  hydrateList,
 } = assetsUiSlice.actions
 export const assetsUiReducer = assetsUiSlice.reducer

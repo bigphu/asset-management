@@ -1,0 +1,21 @@
+.empty {
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--md-on-surface-variant);
+}
+
+.title {
+  margin-bottom: 8px;
+  color: var(--md-on-surface);
+  font-size: var(--md-title-md-size);
+  line-height: var(--md-title-md-line);
+  letter-spacing: var(--md-title-md-tracking);
+  font-weight: var(--md-title-md-weight);
+}
+
+.description {
+  margin-bottom: var(--space-4);
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
+}

@@ -1,0 +1,72 @@
+.button {
+  composes: stateLayer from '../../../styles/state-layer.module.css';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--md-shape-full);
+  background: transparent;
+  color: var(--md-on-surface);
+  box-shadow: var(--md-elevation-0);
+  font-size: var(--md-label-lg-size);
+  line-height: var(--md-label-lg-line);
+  letter-spacing: var(--md-label-lg-tracking);
+  font-weight: var(--md-label-lg-weight);
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-content) * 100%), transparent);
+}
+
+/* Sizes — sm is M3 density -2 for dense toolbars. */
+.md {
+  height: 40px;
+}
+
+.sm {
+  height: 32px;
+  padding: 0 16px;
+  font-size: var(--md-label-md-size);
+  line-height: var(--md-label-md-line);
+  letter-spacing: var(--md-label-md-tracking);
+}
+
+/* Filled button */
+.primary {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+}
+
+.primary:disabled {
+  background: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-container) * 100%), transparent);
+}
+
+/* Outlined button */
+.outline {
+  border: 1px solid var(--md-outline);
+  background: var(--md-surface);
+  color: var(--md-primary);
+}
+
+.outline:disabled {
+  border-color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-container) * 100%), transparent);
+}
+
+/* Text buttons — 12px padding per M3 */
+.ghost {
+  padding: 0 12px;
+  color: var(--md-on-surface);
+}
+
+.ghost-accent {
+  padding: 0 12px;
+  color: var(--md-primary);
+}

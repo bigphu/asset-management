@@ -1,0 +1,105 @@
+/* Same scrim and stacking as Drawer: scrim 40, dialog 50, so Menu popovers
+   (45) sit under it and Toast (60) still shows above it. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--md-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  z-index: 40;
+}
+.scrimOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* M3 basic dialog: extra-large corners, elevation 3, centred. Closed, it is
+   invisible and out of the tab order; `visibility` is delayed on the way out
+   so the fade can finish first. */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100dvh - 2 * var(--space-8));
+  background: var(--md-surface);
+  border-radius: var(--md-shape-xl);
+  box-shadow: var(--md-elevation-3);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -50%) scale(0.96);
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base),
+    visibility 0s linear 160ms;
+}
+.modal.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base),
+    visibility 0s;
+}
+.modal:focus {
+  outline: none;
+}
+.wide {
+  width: min(720px, calc(100vw - 2 * var(--space-4)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .modal.open {
+    transform: translate(-50%, -50%);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 24px 24px 16px;
+  flex: none;
+}
+.title {
+  font-size: var(--md-title-lg-size);
+  line-height: var(--md-title-lg-line);
+  letter-spacing: var(--md-title-lg-tracking);
+  /* font-weight: var(--md-title-lg-weight); */
+  font-weight: extra-bold;
+}
+.description {
+  margin-top: 4px;
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
+}
+
+/* Only the body scrolls, so the title and the action buttons stay in view
+   on long forms such as the export column editor. */
+.body {
+  padding: 8px 24px 24px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: 16px 24px 24px;
+  border-top: 1px solid var(--md-outline-variant);
+  flex: none;
+}

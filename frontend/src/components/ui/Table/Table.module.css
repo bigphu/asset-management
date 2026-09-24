@@ -1,0 +1,101 @@
+.container {
+  background: var(--md-surface);
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--md-shape-md);
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+  /* Fixed layout so a consumer colgroup is authoritative. Without it, auto
+     layout spreads spare width across every column and they drift apart on a
+     wide window. With no colgroup the columns simply share the width evenly. */
+  table-layout: fixed;
+}
+
+.thead {
+  /* M3 data-table header: a surface-container tint rather than a filled bar.
+     This replaces the earlier inverse-surface slab, which was the single
+     heaviest element on an otherwise light page. */
+  background: var(--md-surface-container);
+}
+
+.th {
+  height: 44px;
+  padding: 0 16px;
+  text-align: left;
+  text-transform: none;
+  /* on-surface, not on-surface-variant: the variant only reaches 4.39:1 against
+     surface-container, under the 4.5 floor. These labels are also the sort
+     controls, so they need to read as interactive. */
+  color: var(--md-on-surface);
+  font-size: var(--md-label-lg-size);
+  line-height: var(--md-label-lg-line);
+  letter-spacing: var(--md-label-lg-tracking);
+  font-weight: var(--md-label-lg-weight);
+  border-bottom: 1px solid var(--md-outline-variant);
+  white-space: nowrap;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.sortable:hover {
+  color: var(--md-primary);
+}
+
+.sortArrow {
+  margin-left: 4px;
+  opacity: 0.4;
+  display: inline-block;
+  font-size: 9px;
+}
+.sortActive .sortArrow {
+  opacity: 1;
+  color: var(--md-primary);
+}
+
+.row {
+  border-bottom: 1px solid var(--md-outline-variant);
+  transition: background var(--transition-fast);
+}
+.row:last-child {
+  border-bottom: none;
+}
+tbody tr:hover {
+  background: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-hover) * 100%), transparent);
+}
+
+.td {
+  height: 44px;
+  padding: 0 16px;
+  vertical-align: middle;
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
+}
+
+/* The sort control inside a sortable header: looks like the header text,
+   but is a real button for keyboard and assistive tech. inline-flex keeps it
+   following the th's text-align (right for numeric columns). */
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.sortButton:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+  border-radius: var(--md-shape-xs);
+}

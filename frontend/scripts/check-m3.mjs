@@ -1,0 +1,260 @@
+// Static M3 conformance gate for component CSS. Run: npm run check:m3
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join, sep } from 'node:path'
+
+const here = dirname(fileURLToPath(import.meta.url))
+const src = (p) => join(here, '../src', p)
+
+// Applied to every file listed in RULES except tokens.css, which is the one
+// file whose job is to declare raw color values.
+const GLOBAL_FORBIDS = [
+  [/#[0-9a-fA-F]{3,8}\b/, 'raw hex color'],
+  [/rgba?\(/, 'raw rgb/rgba color'],
+  [/border-radius:\s*\d/, 'literal border-radius (use a --md-shape-* token)'],
+  [/border-[a-z]+-[a-z]+-radius:\s*\d/, 'literal longhand border-radius (use a --md-shape-* token)'],
+]
+
+// A state-layer consumer must not clip: the ::before sits at inset 0 and the
+// global :focus-visible ring is drawn outside the border box, so overflow
+// hidden would swallow the focus indicator.
+const STATE_LAYER_FORBIDS = [
+  [/overflow:\s*hidden/, 'overflow: hidden on a state-layer consumer clips the focus ring'],
+]
+
+export const RULES = [
+  {
+    file: 'styles/tokens.css',
+    requires: [
+      '--md-shape-xs: 4px', '--md-shape-sm: 8px', '--md-shape-md: 12px',
+      '--md-shape-lg: 16px', '--md-shape-xl: 28px', '--md-shape-full: 999px',
+      '--md-elevation-0', '--md-elevation-1', '--md-elevation-2',
+      '--md-elevation-3', '--md-elevation-4', '--md-elevation-5',
+      '--md-state-hover: 0.08', '--md-state-focus: 0.1', '--md-state-pressed: 0.1',
+      '--md-state-dragged: 0.16', '--md-state-disabled-content: 0.38',
+      '--md-state-disabled-container: 0.12',
+      '--md-label-lg-size: 14px', '--md-body-md-size: 14px', '--md-title-lg-size: 22px',
+      '--md-primary:', '--md-on-primary:', '--md-outline-variant:', '--md-scrim:',
+    ],
+  },
+  {
+    file: 'styles/state-layer.module.css',
+    requires: [
+      '.stateLayer',
+      'isolation: isolate',
+      'background: currentColor',
+      'var(--md-state-hover)',
+      'var(--md-state-focus)',
+      'var(--md-state-pressed)',
+      'z-index: 0',
+    ],
+  },
+  {
+    file: 'components/ui/Button/Button.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'height: 40px',
+      'var(--md-shape-full)',
+      'var(--md-label-lg-size)',
+      'var(--md-state-disabled-content)',
+      'var(--md-state-disabled-container)',
+      'var(--md-elevation-0)',
+    ],
+    forbids: [
+      [/translateY/, 'M3 uses state layers, not a translate on press'],
+      [/opacity:\s*0\.5/, 'disabled must use 0.38 content / 0.12 container, not 0.5'],
+    ],
+  },
+  {
+    file: 'components/ui/IconButton/IconButton.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'width: 40px',
+      'height: 40px',
+      'var(--md-shape-full)',
+      'var(--md-on-surface-variant)',
+      'inset: -4px',
+    ],
+  },
+  {
+    file: 'components/ui/Input/Input.module.css',
+    // Density -1. Pinned so a field cannot silently drift back to 56px.
+    requires: ['height: 48px', 'var(--md-shape-xs)', 'var(--md-outline)', 'var(--md-body-lg-size)'],
+  },
+  {
+    file: 'components/ui/Select/Select.module.css',
+    requires: ['height: 48px', 'var(--md-shape-xs)', 'var(--md-outline)'],
+  },
+  {
+    file: 'components/ui/FormField/FormField.module.css',
+    requires: ['var(--md-body-sm-size)', 'var(--md-on-surface-variant)'],
+  },
+  {
+    file: 'components/ui/Checkbox/Checkbox.module.css',
+    requires: [
+      'appearance: none',
+      'width: 18px',
+      'var(--md-primary)',
+      ':checked',
+      ':indeterminate',
+      'inset: -11px',
+    ],
+  },
+  {
+    file: 'components/ui/Card/Card.module.css',
+    requires: ['var(--md-shape-md)', 'var(--md-outline-variant)', 'var(--md-elevation-0)'],
+  },
+  {
+    file: 'components/ui/Menu/Menu.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'var(--md-elevation-2)',
+      'var(--md-shape-xs)',
+      'var(--md-surface-container)',
+      'height: 48px',
+    ],
+  },
+  {
+    file: 'components/ui/Drawer/Drawer.module.css',
+    requires: [
+      'var(--md-scrim)',
+      'var(--md-elevation-1)',
+      'var(--md-shape-lg)',
+      'var(--md-title-lg-size)',
+    ],
+  },
+  {
+    file: 'components/ui/Modal/Modal.module.css',
+    requires: [
+      'var(--md-scrim)',
+      'var(--md-elevation-3)',
+      'var(--md-shape-xl)',
+      'var(--md-title-lg-size)',
+    ],
+  },
+  {
+    file: 'components/ui/Toast/Toast.module.css',
+    requires: [
+      'var(--md-inverse-surface)',
+      'var(--md-inverse-on-surface)',
+      'var(--md-inverse-primary)',
+      'var(--md-elevation-3)',
+      'var(--md-shape-xs)',
+    ],
+  },
+  {
+    file: 'components/ui/Badge/Badge.module.css',
+    requires: ['var(--md-shape-sm)', 'var(--md-label-md-size)'],
+  },
+  {
+    file: 'components/ui/Table/Table.module.css',
+    requires: [
+      'var(--md-outline-variant)',
+      'var(--md-label-lg-size)',
+      'height: 44px',
+      // The header is an M3 surface-container tint now, not the inverse slab.
+      'var(--md-surface-container)',
+      // A consumer colgroup is only authoritative under fixed layout.
+      'table-layout: fixed',
+    ],
+    forbids: [
+      [/--md-inverse-surface/, 'the inverse-surface header was retired; use --md-surface-container'],
+    ],
+  },
+  {
+    file: 'components/ui/Pagination/Pagination.module.css',
+    requires: [
+      'composes: stateLayer from',
+      'var(--md-shape-full)',
+      'var(--md-label-lg-size)',
+      'var(--md-state-disabled-content)',
+    ],
+    forbids: [[/opacity:\s*0\.3/, 'disabled must use 0.38 content, not 0.3']],
+  },
+  {
+    file: 'components/ui/EmptyState/EmptyState.module.css',
+    requires: ['var(--md-title-md-size)', 'var(--md-body-md-size)'],
+  },
+  {
+    file: 'components/ui/PageHeader/PageHeader.module.css',
+    requires: ['var(--md-headline-sm-size)', 'var(--md-body-md-size)'],
+  },
+  {
+    file: 'styles/tokens.css',
+    requires: ['--md-elevation-1'],
+    forbids: [
+      [/--shadow-sm:/, 'legacy shadow token should be retired'],
+      [/--shadow-lg:/, 'legacy shadow token should be retired'],
+    ],
+  },
+  {
+    // The Input primitive is a 56px M3 outlined field with its own border and
+    // focus outline. Nested inside .search, which already draws the field, that
+    // has to be unwound with selectors that outrank .input / .input:focus.
+    file: 'components/ui/SearchField/SearchField.module.css',
+    requires: ['.search .searchInput', '.search .searchInput:focus'],
+  },
+]
+
+let totalFailures = 0
+for (const rule of RULES) {
+  const problems = []
+  const path = src(rule.file)
+  if (!existsSync(path)) {
+    problems.push('file not found')
+  } else {
+    const css = readFileSync(path, 'utf8')
+    if (rule.file !== 'styles/tokens.css') {
+      for (const [pattern, why] of GLOBAL_FORBIDS) {
+        if (pattern.test(css)) problems.push(`contains ${why}`)
+      }
+    }
+    for (const needle of rule.requires ?? []) {
+      if (!css.includes(needle)) problems.push(`missing required: ${needle}`)
+    }
+    for (const [pattern, why] of rule.forbids ?? []) {
+      if (pattern.test(css)) problems.push(why)
+    }
+    if (css.includes('composes: stateLayer from')) {
+      for (const [pattern, why] of STATE_LAYER_FORBIDS) {
+        if (pattern.test(css)) problems.push(why)
+      }
+    }
+  }
+  if (problems.length === 0) {
+    console.log(`PASS  ${rule.file}`)
+  } else {
+    for (const p of problems) console.log(`FAIL  ${rule.file} — ${p}`)
+    totalFailures += problems.length
+  }
+}
+// RULES is a hand-written list, so a new or renamed stylesheet would otherwise
+// never be checked at all. Sweep the component and style directories and apply
+// the global forbids to anything RULES does not already name.
+function walk(dir) {
+  return readdirSync(dir).flatMap((name) => {
+    const full = join(dir, name)
+    return statSync(full).isDirectory() ? walk(full) : full.endsWith('.module.css') ? [full] : []
+  })
+}
+const named = new Set(RULES.map((r) => src(r.file)))
+let swept = 0
+for (const dir of ['components/ui', 'styles']) {
+  for (const file of walk(src(dir))) {
+    if (named.has(file)) continue
+    swept++
+    const css = readFileSync(file, 'utf8')
+    const rel = file.slice(src('').length).split(sep).join('/')
+    for (const [pattern, why] of GLOBAL_FORBIDS) {
+      if (pattern.test(css)) {
+        console.log(`FAIL  ${rel} (unlisted) — contains ${why}`)
+        totalFailures++
+      }
+    }
+  }
+}
+
+console.log(totalFailures
+  ? `\n${totalFailures} FAILING`
+  : `\n${RULES.length} file(s) conform, ${swept} unlisted file(s) swept`)
+process.exit(totalFailures ? 1 : 0)

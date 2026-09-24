@@ -38,6 +38,18 @@ lerna-debug.log*
 # Docker (if applicable)
 .dockerignore
 
+# Decision-record tooling and its source records. Only the generated
+# documents under /docs/views are published; regenerate them with
+# `go run ./tools/records` before committing.
+/docs/records/*
+!/docs/records/adr
+/tools
+/templates
+go.mod
+go.sum
+/records
+/records.exe
+/templates
 .claude
 
 # Local tooling / personal docs

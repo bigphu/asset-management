@@ -1,0 +1,44 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* M3 chip shape */
+.pill {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--md-shape-sm);
+  font-size: var(--md-label-md-size);
+  line-height: var(--md-label-md-line);
+  letter-spacing: var(--md-label-md-tracking);
+  font-weight: var(--md-label-md-weight);
+  text-transform: uppercase;
+}
+
+.rect {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--md-shape-sm);
+  font-size: var(--md-label-md-size);
+  line-height: var(--md-label-md-line);
+  letter-spacing: var(--md-label-md-tracking);
+  font-weight: var(--md-label-md-weight);
+}
+
+.good {
+  background: var(--color-status-good-bg);
+  color: var(--color-status-good-text);
+}
+.warn {
+  background: var(--color-status-warn-bg);
+  color: var(--color-status-warn-text);
+}
+.critical {
+  background: var(--color-status-critical-bg);
+  color: var(--color-status-critical-text);
+}
+.neutral {
+  background: var(--color-status-neutral-bg);
+  color: var(--color-status-neutral-text);
+}

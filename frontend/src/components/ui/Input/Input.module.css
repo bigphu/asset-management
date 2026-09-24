@@ -1,0 +1,35 @@
+/* M3 outlined text field at density -1 (48px). M3's default is 56px; the
+   comfortable size reads bulky in a dense admin tool, and this matches the
+   density the Table already uses. */
+.input {
+  width: 100%;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-shape-xs);
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  font-size: var(--md-body-lg-size);
+  line-height: var(--md-body-lg-line);
+  letter-spacing: var(--md-body-lg-tracking);
+  transition: border-color var(--transition-fast);
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--md-on-surface);
+}
+
+.input:focus {
+  border: 2px solid var(--md-primary);
+  padding: 0 15px; /* keep text from shifting when the outline thickens */
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--md-on-surface-variant);
+}
+
+.input:disabled {
+  border-color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-container) * 100%), transparent);
+  color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-content) * 100%), transparent);
+}

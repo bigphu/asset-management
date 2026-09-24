@@ -1,0 +1,184 @@
+/**
+ * Design tokens — single source of truth for color, spacing, radius, shadow
+ * and typography. Components must consume these custom properties instead
+ * of hard-coded values so the palette can change in one place.
+ */
+:root {
+  /* ---- Color: neutrals ---- */
+  --color-bg: #f9fafb;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-border-strong: #d1d5db;
+  /* Control boundaries (text fields, outlined buttons). WCAG SC 1.4.11 wants
+     3:1 against the adjacent surface; --color-border-strong is 1.47:1 and is
+     kept only for decorative dividers. */
+  --color-border-outline: #8a9099;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-text-faint: #9ca3af;
+
+  /* ---- Color: brand accent ---- */
+  --color-accent: #25764B;
+  --color-accent-hover: #1C6340;
+  --color-accent-soft: #E7F4ED;
+  --color-accent-contrast: #ffffff;
+
+  /* Accent variant for use on inverted surfaces, where the standard
+     accent is too dark to read (see --color-inverse-bg). */
+  --color-accent-on-inverse: #4FA97A;
+
+  /* ---- Color: sidebar ---- */
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-text: #1f2430;
+  --color-sidebar-text-muted: #6b7280;
+  --color-sidebar-hover-bg: #f4f5f7;
+  --color-sidebar-active-bg: #f3f4f6;
+  --color-sidebar-active-text: #111827;
+  --color-sidebar-border: #e5e7eb;
+
+  /* ---- Color: inverted surface (dark bars on a light theme:
+     table headers, toasts) ---- */
+  --color-inverse-bg: #111827;
+  --color-inverse-text: #ffffff;
+  --color-inverse-text-muted: #9ca3af;
+
+  /* ---- Color: semantic status (independent of brand accent) ---- */
+  --color-status-good-bg: #dcfce7;
+  --color-status-good-text: #15803d;
+  --color-status-warn-bg: #fef3c7;
+  --color-status-warn-text: #92620a;
+  --color-status-critical-bg: #fee2e2;
+  --color-status-critical-text: #b91c1c;
+  --color-status-neutral-bg: #f3f4f6;
+  --color-status-neutral-text: #4b5563;
+
+  /* ---- Typography ----
+     No webfont is loaded yet — this stack is system-only on purpose.
+     Swap in a loaded font family here (and only here) if the design
+     system adopts one later. */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.8125rem; /* 13px */
+  --font-size-md: 0.875rem; /* 14px */
+  --font-size-lg: 1rem; /* 16px */
+  --font-size-xl: 1.375rem; /* 22px */
+  --font-size-2xl: 1.625rem; /* 26px */
+
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+
+  /* ---- Radius scale ---- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-pill: 999px;
+
+  /* ---- Layout ---- */
+  --sidebar-width: 226px;
+  --sidebar-width-collapsed: 64px;
+
+  /* ---- Motion ---- */
+  --transition-fast: 120ms ease;
+  --transition-base: 160ms ease;
+
+  /* ---- Material Design 3: shape scale ---- */
+  --md-shape-xs: 4px;
+  --md-shape-sm: 8px;
+  --md-shape-md: 12px;
+  --md-shape-lg: 16px;
+  --md-shape-xl: 28px;
+  --md-shape-full: 999px;
+
+  /* ---- Material Design 3: elevation ---- */
+  --md-elevation-0: none;
+  --md-elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-elevation-2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --md-elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --md-elevation-4: 0 6px 10px 4px rgba(0, 0, 0, 0.15), 0 2px 3px 0 rgba(0, 0, 0, 0.3);
+  --md-elevation-5: 0 8px 12px 6px rgba(0, 0, 0, 0.15), 0 4px 4px 0 rgba(0, 0, 0, 0.3);
+
+  /* ---- Material Design 3: state layer opacities ---- */
+  --md-state-hover: 0.08;
+  --md-state-focus: 0.1;
+  --md-state-pressed: 0.1;
+  --md-state-dragged: 0.16;
+  --md-state-disabled-content: 0.38;
+  --md-state-disabled-container: 0.12;
+
+  /* ---- Material Design 3: type scale ----
+     Applied to the existing system font stack; M3 permits brand fonts. */
+  --md-headline-sm-size: 24px;
+  --md-headline-sm-line: 32px;
+  --md-headline-sm-tracking: 0;
+  --md-headline-sm-weight: 400;
+
+  --md-title-lg-size: 22px;
+  --md-title-lg-line: 28px;
+  --md-title-lg-tracking: 0;
+  --md-title-lg-weight: 400;
+
+  --md-title-md-size: 16px;
+  --md-title-md-line: 24px;
+  --md-title-md-tracking: 0.15px;
+  --md-title-md-weight: 500;
+
+  --md-title-sm-size: 14px;
+  --md-title-sm-line: 20px;
+  --md-title-sm-tracking: 0.1px;
+  --md-title-sm-weight: 500;
+
+  --md-body-lg-size: 16px;
+  --md-body-lg-line: 24px;
+  --md-body-lg-tracking: 0.5px;
+  --md-body-lg-weight: 400;
+
+  --md-body-md-size: 14px;
+  --md-body-md-line: 20px;
+  --md-body-md-tracking: 0.25px;
+  --md-body-md-weight: 400;
+
+  --md-body-sm-size: 12px;
+  --md-body-sm-line: 16px;
+  --md-body-sm-tracking: 0.4px;
+  --md-body-sm-weight: 400;
+
+  --md-label-lg-size: 14px;
+  --md-label-lg-line: 20px;
+  --md-label-lg-tracking: 0.1px;
+  --md-label-lg-weight: 500;
+
+  --md-label-md-size: 12px;
+  --md-label-md-line: 16px;
+  --md-label-md-tracking: 0.5px;
+  --md-label-md-weight: 500;
+
+  /* ---- Material Design 3: color roles ----
+     Components reference these, never the palette tokens directly, so a future
+     tonal palette can be swapped in here without touching any component. */
+  --md-primary: var(--color-accent);
+  --md-on-primary: var(--color-accent-contrast);
+  --md-primary-container: var(--color-accent-soft);
+  --md-on-primary-container: var(--color-accent);
+  --md-surface: var(--color-surface);
+  --md-surface-container: var(--color-status-neutral-bg);
+  --md-on-surface: var(--color-text);
+  --md-on-surface-variant: var(--color-text-muted);
+  --md-outline: var(--color-border-outline);
+  --md-outline-variant: var(--color-border);
+  --md-error: var(--color-status-critical-text);
+  --md-error-container: var(--color-status-critical-bg);
+  --md-inverse-surface: var(--color-inverse-bg);
+  --md-inverse-on-surface: var(--color-inverse-text);
+  --md-inverse-on-surface-variant: var(--color-inverse-text-muted);
+  --md-inverse-primary: var(--color-accent-on-inverse);
+  --md-scrim: rgba(17, 24, 39, 0.32);
+}

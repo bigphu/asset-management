@@ -1,0 +1,50 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* M3 icon-button sizing so page controls match the rest of the toolbar. */
+.pageBtn {
+  composes: stateLayer from '../../../styles/state-layer.module.css';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  border: none;
+  border-radius: var(--md-shape-full);
+  background: transparent;
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-label-lg-size);
+  line-height: var(--md-label-lg-line);
+  letter-spacing: var(--md-label-lg-tracking);
+  font-weight: var(--md-label-lg-weight);
+}
+
+.active {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+}
+
+.pageBtn:disabled {
+  cursor: default;
+  color: color-mix(in srgb, var(--md-on-surface) calc(var(--md-state-disabled-content) * 100%), transparent);
+}
+
+/* Skipped-pages marker: sized like a page button so the row doesn't jump. */
+.gap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-label-lg-size);
+  user-select: none;
+}

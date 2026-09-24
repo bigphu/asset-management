@@ -1,0 +1,92 @@
+.assetCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.assetIcon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--md-shape-sm);
+  background: var(--md-surface-container);
+  color: var(--md-on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lets the name and tag ellipsize instead of forcing the flex row wider than
+   its fixed-layout column. */
+.assetText {
+  min-width: 0;
+}
+
+.assetName {
+  font-weight: 600;
+  font-size: var(--md-body-md-size);
+  line-height: var(--md-body-md-line);
+  letter-spacing: var(--md-body-md-tracking);
+  color: var(--md-on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assetTag {
+  font-size: var(--md-body-sm-size);
+  line-height: var(--md-body-sm-line);
+  letter-spacing: var(--md-body-sm-tracking);
+  color: var(--md-on-surface-variant);
+  font-family: var(--font-mono);
+}
+
+/* Type is a plain attribute, not a state. Rendering it as a filled chip made it
+   compete with Status, which is the column that actually carries a signal. */
+.typeText {
+  color: var(--md-on-surface-variant);
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Right-aligned dates only line up with tabular figures. */
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.clearFiltersBtn {
+  border: 1px solid var(--md-outline);
+  background: var(--md-surface);
+  border-radius: var(--md-shape-full);
+  padding: 6px 16px;
+  font-size: var(--md-label-lg-size);
+  line-height: var(--md-label-lg-line);
+  letter-spacing: var(--md-label-lg-tracking);
+  font-weight: var(--md-label-lg-weight);
+  color: var(--md-primary);
+}
+.clearFiltersBtn:hover {
+  background: var(--md-primary-container);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: var(--space-4) 2px 0;
+  color: var(--md-on-surface-variant);
+  font-size: var(--md-body-sm-size);
+  line-height: var(--md-body-sm-line);
+  letter-spacing: var(--md-body-sm-tracking);
+}

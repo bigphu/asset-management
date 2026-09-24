@@ -1,0 +1,213 @@
+import {
+  Armchair,
+  Car,
+  Computer,
+  Laptop,
+  Monitor,
+  Package,
+  Printer,
+  Projector,
+  Router,
+  Server,
+  Smartphone,
+  Table2,
+  Tablet,
+  type LucideIcon,
+} from 'lucide-react'
+import { Checkbox, EmptyState, Menu, Pagination, Table } from '@/components/ui'
+import { formatDateDisplay } from '@/utils/formatDate'
+import { useAppDispatch, useAppSelector } from '@/app/store'
+import { clearFilters, setPage, setSort } from '../store/assetsUiSlice'
+import type { Asset, AssetSort, AssetType } from '../types'
+import { StatusBadge } from './StatusBadge'
+import styles from './AssetTable.module.css'
+
+/** Typed as a full Record so adding an AssetType fails the build rather than
+ *  silently falling through to the generic box. */
+const ASSET_ICONS: Record<AssetType, LucideIcon> = {
+  Laptop,
+  Desktop: Computer,
+  Monitor,
+  Tablet,
+  Phone: Smartphone,
+  Printer,
+  Server,
+  Router,
+  Projector,
+  Desk: Table2,
+  Chair: Armchair,
+  Vehicle: Car,
+}
+
+const COLUMNS: { key: AssetSort['key']; label: string }[] = [
+  { key: 'tag', label: 'Asset' },
+  { key: 'type', label: 'Type' },
+  { key: 'status', label: 'Status' },
+  { key: 'location', label: 'Location' },
+  { key: 'purchaseDate', label: 'Purchased' },
+]
+
+export interface AssetTableProps {
+  pageItems: Asset[]
+  total: number
+  page: number
+  pageSize: number
+  pageCount: number
+  isLoading: boolean
+  isError: boolean
+  onEdit: (asset: Asset) => void
+  onDelete: (asset: Asset) => void
+}
+
+export function AssetTable({
+  pageItems,
+  total,
+  page,
+  pageSize,
+  pageCount,
+  isLoading,
+  isError,
+  onEdit,
+  onDelete,
+}: AssetTableProps) {
+  const dispatch = useAppDispatch()
+  const sort = useAppSelector((state) => state.assetsUi.sort)
+
+  return (
+    <>
+      <Table.Container>
+        <Table.Root>
+          {/* Fixed layout plus these widths is what stops the columns drifting
+              apart on a wide window: every other column is pinned, so Asset —
+              the only unsized column — absorbs all the slack. */}
+          <colgroup>
+            <col style={{ width: 52 }} />
+            <col />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: 140 }} />
+            <col style={{ width: '18%' }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 56 }} />
+          </colgroup>
+          <Table.Head>
+            <Table.Row>
+              <Table.HeaderCell style={{ textAlign: 'right' }}>
+                <Checkbox aria-label="Select all assets" disabled={pageItems.length === 0} />
+              </Table.HeaderCell>
+              {COLUMNS.map((col) => (
+                <Table.HeaderCell
+                  key={col.key}
+                  className={col.key === 'purchaseDate' ? styles.numeric : undefined}
+                  sortable
+                  sortActive={sort.key === col.key}
+                  sortDirection={sort.direction}
+                  onClick={() => dispatch(setSort(col.key))}
+                >
+                  {col.label}
+                </Table.HeaderCell>
+              ))}
+              <Table.HeaderCell aria-label="Actions" />
+            </Table.Row>
+          </Table.Head>
+          <tbody>
+            {isLoading ? (
+              <Table.Row>
+                <Table.Cell colSpan={7}>
+                  <EmptyState title="Loading assets…" />
+                </Table.Cell>
+              </Table.Row>
+            ) : isError ? (
+              <Table.Row>
+                <Table.Cell colSpan={7}>
+                  <EmptyState
+                    title="Couldn't load the inventory"
+                    description="Something went wrong fetching assets. Try again shortly."
+                  />
+                </Table.Cell>
+              </Table.Row>
+            ) : total === 0 ? (
+              <Table.Row>
+                <Table.Cell colSpan={7}>
+                  <EmptyState
+                    title="No assets match your filters"
+                    description="Try removing a filter or clearing the search."
+                    action={
+                      <button
+                        type="button"
+                        className={styles.clearFiltersBtn}
+                        onClick={() => dispatch(clearFilters())}
+                      >
+                        Clear filters
+                      </button>
+                    }
+                  />
+                </Table.Cell>
+              </Table.Row>
+            ) : (
+              pageItems.map((asset) => {
+                const Icon = ASSET_ICONS[asset.type] ?? Package
+                return (
+                  <Table.Row key={asset.id}>
+                    <Table.Cell style={{ textAlign: 'right' }}>
+                      <Checkbox aria-label={`Select ${asset.tag}`} />
+                    </Table.Cell>
+                    <Table.Cell>
+                      <div className={styles.assetCell}>
+                        {/* Decorative: the type it depicts is already the next
+                            column, read out as text. */}
+                        <span className={styles.assetIcon}>
+                          <Icon size={16} aria-hidden="true" />
+                        </span>
+                        <div className={styles.assetText}>
+                          <div className={styles.assetName}>{asset.name}</div>
+                          <div className={styles.assetTag}>{asset.tag}</div>
+                        </div>
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell className={styles.typeText}>{asset.type}</Table.Cell>
+                    <Table.Cell>
+                      <StatusBadge status={asset.status} />
+                    </Table.Cell>
+                    <Table.Cell className={styles.ellipsis}>{asset.location}</Table.Cell>
+                    <Table.Cell className={styles.numeric}>
+                      {formatDateDisplay(asset.purchaseDate)}
+                    </Table.Cell>
+                    <Table.Cell style={{ textAlign: 'right' }}>
+                      <Menu
+                        triggerLabel={`More actions for ${asset.tag}`}
+                        trigger={
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="5" cy="12" r="1.8" />
+                            <circle cx="12" cy="12" r="1.8" />
+                            <circle cx="19" cy="12" r="1.8" />
+                          </svg>
+                        }
+                        items={[
+                          { label: 'Edit', onSelect: () => onEdit(asset) },
+                          { label: 'Delete', danger: true, onSelect: () => onDelete(asset) },
+                        ]}
+                      />
+                    </Table.Cell>
+                  </Table.Row>
+                )
+              })
+            )}
+          </tbody>
+        </Table.Root>
+      </Table.Container>
+
+      <div className={styles.footer}>
+        <span className={styles.tabular}>
+          {total === 0
+            ? 'No assets found'
+            : (() => {
+                const start = (page - 1) * pageSize + 1
+                const end = start + pageItems.length - 1
+                return `Showing ${start}–${end} of ${total} asset${total === 1 ? '' : 's'}`
+              })()}
+        </span>
+        <Pagination page={page} pageCount={pageCount} onPageChange={(p) => dispatch(setPage(p))} />
+      </div>
+    </>
+  )
+}

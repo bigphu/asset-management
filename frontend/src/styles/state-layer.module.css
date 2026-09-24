@@ -1,0 +1,48 @@
+/*
+ * Material Design 3 state layer.
+ * Composed by every interactive component. The layer is a ::before overlay
+ * tinted with currentColor at the spec opacity, which is what makes hover,
+ * focus and press read as Material rather than as a background swap.
+ *
+ * Content must stay above the layer, so children are lifted to z-index 1.
+ */
+.stateLayer {
+  position: relative;
+  isolation: isolate;
+  cursor: pointer;
+}
+
+.stateLayer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.stateLayer > * {
+  position: relative;
+  z-index: 1;
+}
+
+.stateLayer:hover:not(:disabled)::before {
+  opacity: var(--md-state-hover);
+}
+
+.stateLayer:focus-visible:not(:disabled)::before {
+  opacity: var(--md-state-focus);
+}
+
+.stateLayer:active:not(:disabled)::before {
+  opacity: var(--md-state-pressed);
+}
+
+/* The global :focus-visible outline must remain visible, so the layer never
+   clips it — no overflow: hidden here, and outline-offset keeps it outside. */
+.stateLayer:focus-visible {
+  outline-offset: 2px;
+}

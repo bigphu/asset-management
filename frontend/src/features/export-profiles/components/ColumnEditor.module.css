@@ -1,0 +1,86 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  padding: 7px 8px;
+  background: var(--color-bg);
+}
+.row[data-excluded] {
+  opacity: 0.5;
+}
+
+.key {
+  font-size: 10.5px;
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+  min-width: 64px;
+}
+
+.labelInput {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: var(--color-surface);
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  color: var(--color-text);
+}
+
+/* Grab handle: the whole reorder affordance. 32px tall so it is an easy
+   touch target, and touch-action: none so a drag on it never scrolls the
+   dialog instead. */
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 24px;
+  height: 32px;
+  margin-right: -4px;
+  padding: 0;
+  border: none;
+  border-radius: var(--md-shape-xs);
+  background: transparent;
+  color: var(--color-text-faint);
+  cursor: grab;
+  touch-action: none;
+}
+.handle:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* Lifted look while being dragged. Excluded rows are dimmed; a dragged one
+   comes back to full strength so it is clear what is moving. */
+.row[data-dragging] {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  border-color: var(--md-primary);
+  box-shadow: var(--md-elevation-2);
+}
+.row[data-dragging] .handle {
+  cursor: grabbing;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

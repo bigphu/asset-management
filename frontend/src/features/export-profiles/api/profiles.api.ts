@@ -1,37 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { apiClient } from '@/lib/apiClient'
 import type { ExportProfile, ExportProfileInput } from '../types'
-import { mockProfiles } from './mockProfiles'
 
-// Mock "backend" — see the note in `features/assets/api/assets.api.ts`; the
-// same pattern applies here once saved profiles have a real endpoint
-// (ADR-0013: per-user database record).
+// Backend calls (ADR-0013: per-user database record). Contract:
+// backend/api/routes/exportProfiles.js, browsable at /api/docs.
 
-function delay<T>(value: T, ms = 300): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms))
-}
+const fetchProfiles = () => apiClient.get<ExportProfile[]>('/export-profiles')
 
-async function fetchProfiles(): Promise<ExportProfile[]> {
-  return delay(mockProfiles)
-}
+const createProfile = (input: ExportProfileInput) =>
+  apiClient.post<ExportProfile>('/export-profiles', input)
 
-async function createProfile(input: ExportProfileInput): Promise<ExportProfile> {
-  const created: ExportProfile = { id: `profile-${Date.now()}`, ...input }
-  mockProfiles.push(created)
-  return delay(created)
-}
+const updateProfile = (id: string, input: ExportProfileInput) =>
+  apiClient.put<ExportProfile>(`/export-profiles/${encodeURIComponent(id)}`, input)
 
-async function updateProfile(id: string, input: ExportProfileInput): Promise<ExportProfile> {
-  const index = mockProfiles.findIndex((p) => p.id === id)
-  const updated: ExportProfile = { id, ...input }
-  if (index !== -1) mockProfiles[index] = updated
-  return delay(updated)
-}
-
-async function deleteProfile(id: string): Promise<void> {
-  const index = mockProfiles.findIndex((p) => p.id === id)
-  if (index !== -1) mockProfiles.splice(index, 1)
-  return delay(undefined)
-}
+const deleteProfile = (id: string) => apiClient.delete(`/export-profiles/${encodeURIComponent(id)}`)
 
 export const profileKeys = {
   all: ['export-profiles'] as const,

@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Button, FormField, Modal, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { describeError } from '@/lib/apiClient'
 import {
   useCreateProfileMutation,
   useProfilesQuery,
@@ -59,10 +60,13 @@ export function ProfileFormModal({ editingProfileId, onClose }: ProfileFormModal
       onClose()
     }
 
+    // e.g. DUPLICATE_NAME — the dialog stays open so the name can be changed.
+    const onError = (error: Error) => toast.show(describeError(error))
+
     if (existing) {
-      updateProfile.mutate({ id: existing.id, input }, { onSuccess })
+      updateProfile.mutate({ id: existing.id, input }, { onSuccess, onError })
     } else {
-      createProfile.mutate(input, { onSuccess })
+      createProfile.mutate(input, { onSuccess, onError })
     }
   }
 

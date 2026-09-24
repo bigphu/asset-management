@@ -9,17 +9,17 @@ import {
   removeFilter,
   clearConditions,
 } from '../store/assetsUiSlice'
+import { useReferenceDataQuery } from '../api/assets.api'
 import {
-  ASSET_STATUSES,
-  ASSET_TYPES,
   FILTER_FIELDS,
   type FilterField,
   type FilterOperator,
+  type ReferenceData,
+  type ReferenceItem,
 } from '../types'
 import styles from './AssetToolbar.module.css'
 
 export interface AssetToolbarProps {
-  locations: string[]
   onExport: () => void
   onAdd: () => void
 }
@@ -29,7 +29,7 @@ export interface AssetToolbarProps {
  * actions sit together on the right — the filters folded into one popover so
  * the bar stays a single row however many conditions are applied.
  */
-export function AssetToolbar({ locations, onExport, onAdd }: AssetToolbarProps) {
+export function AssetToolbar({ onExport, onAdd }: AssetToolbarProps) {
   const dispatch = useAppDispatch()
   const search = useAppSelector((state) => state.assetsUi.filters.search)
 
@@ -44,7 +44,7 @@ export function AssetToolbar({ locations, onExport, onAdd }: AssetToolbarProps) 
       />
 
       <div className={styles.actions}>
-        <FiltersPopover locations={locations} />
+        <FiltersPopover />
 
         <Button variant="outline" onClick={onExport}>
           <Upload size={18} aria-hidden="true" />
@@ -66,8 +66,18 @@ const FIELD_LABELS: Record<FilterField, string> = {
   location: 'Location',
 }
 
-function FiltersPopover({ locations }: { locations: string[] }) {
+/** Which reference-data list offers the values for each filter field. */
+const VALUES_KEY: Record<FilterField, keyof ReferenceData> = {
+  type: 'types',
+  status: 'statuses',
+  location: 'locations',
+}
+
+const NO_VALUES: ReferenceItem[] = []
+
+function FiltersPopover() {
   const dispatch = useAppDispatch()
+  const { data: referenceData } = useReferenceDataQuery()
   const conditions = useAppSelector((state) => state.assetsUi.filters.conditions)
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -82,11 +92,8 @@ function FiltersPopover({ locations }: { locations: string[] }) {
   // Only rows with a value filter anything; search lives in the bar itself.
   const activeCount = conditions.filter((c) => c.value).length
 
-  const valuesFor: Record<FilterField, readonly string[]> = {
-    type: ASSET_TYPES,
-    status: ASSET_STATUSES,
-    location: locations,
-  }
+  // Options carry the code (what filters match on) and show the display name.
+  const valuesFor = (field: FilterField) => referenceData?.[VALUES_KEY[field]] ?? NO_VALUES
 
   useEffect(() => {
     if (!open) return
@@ -208,9 +215,9 @@ function FiltersPopover({ locations }: { locations: string[] }) {
                       <option value="" disabled>
                         Select…
                       </option>
-                      {valuesFor[condition.field].map((value) => (
-                        <option key={value} value={value}>
-                          {value}
+                      {valuesFor(condition.field).map((item) => (
+                        <option key={item.code} value={item.code}>
+                          {item.name}
                         </option>
                       ))}
                     </Select>

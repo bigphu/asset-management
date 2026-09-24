@@ -1,4 +1,5 @@
 import { cn } from '@/utils/cn'
+import { pageSlots } from './pageSlots'
 import styles from './Pagination.module.css'
 
 export interface PaginationProps {
@@ -10,10 +11,8 @@ export interface PaginationProps {
 export function Pagination({ page, pageCount, onPageChange }: PaginationProps) {
   if (pageCount <= 1) return null
 
-  const pages = Array.from({ length: pageCount }, (_, i) => i + 1)
-
   return (
-    <div className={styles.pagination}>
+    <nav className={styles.pagination} aria-label="Pagination">
       <button
         type="button"
         className={styles.pageBtn}
@@ -23,17 +22,24 @@ export function Pagination({ page, pageCount, onPageChange }: PaginationProps) {
       >
         &larr;
       </button>
-      {pages.map((p) => (
-        <button
-          key={p}
-          type="button"
-          className={cn(styles.pageBtn, styles.tabular, p === page && styles.active)}
-          onClick={() => onPageChange(p)}
-          aria-current={p === page ? 'page' : undefined}
-        >
-          {p}
-        </button>
-      ))}
+      {pageSlots(page, pageCount).map((slot) =>
+        typeof slot === 'number' ? (
+          <button
+            key={slot}
+            type="button"
+            className={cn(styles.pageBtn, styles.tabular, slot === page && styles.active)}
+            onClick={() => onPageChange(slot)}
+            aria-label={`Page ${slot}`}
+            aria-current={slot === page ? 'page' : undefined}
+          >
+            {slot}
+          </button>
+        ) : (
+          <span key={slot} className={styles.gap} aria-hidden="true">
+            …
+          </span>
+        ),
+      )}
       <button
         type="button"
         className={styles.pageBtn}
@@ -43,6 +49,6 @@ export function Pagination({ page, pageCount, onPageChange }: PaginationProps) {
       >
         &rarr;
       </button>
-    </div>
+    </nav>
   )
 }

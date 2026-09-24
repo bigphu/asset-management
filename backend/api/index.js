@@ -1,5 +1,7 @@
 const express = require('express');
+const swaggerUi = require('swagger-ui-express');
 const { notFound, errorHandler } = require('./errors');
+const openapi = require('./openapi');
 
 const router = express.Router();
 
@@ -12,6 +14,17 @@ const ROUTES = [
   ['/export-profiles', require('./routes/exportProfiles')],
   ['/exports', require('./routes/exports')],
 ];
+
+// API documentation: the OpenAPI document and Swagger UI rendering it.
+router.get('/openapi.json', (req, res) => res.json(openapi));
+router.use(
+  '/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(openapi, {
+    customSiteTitle: 'Asset Management API',
+    swaggerOptions: { displayRequestDuration: true, tryItOutEnabled: true },
+  }),
+);
 
 // Parsed here rather than app-wide so a malformed body reaches this router's
 // JSON error handler instead of the scaffold's HTML error page.

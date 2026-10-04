@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { Button, EmptyState, PageHeader, Table } from '@/components/ui'
-import { describeError } from '@/lib/apiClient'
+import { PermissionGate } from '@/features/auth'
 import { useReferenceDataQuery } from '@/features/assets'
+import { describeError } from '@/lib/apiClient'
 import { AssetTypeFormModal } from '../components/AssetTypeFormModal'
 
 export function AssetTypesPage() {
@@ -39,7 +41,9 @@ export function AssetTypesPage() {
           <Table.Body>
             {types.map((type) => (
               <Table.Row key={type.code}>
-                <Table.Cell>{type.code}</Table.Cell>
+                <Table.Cell>
+                  <Link to={`/asset-types/${encodeURIComponent(type.code)}`}>{type.code}</Link>
+                </Table.Cell>
                 <Table.Cell>{type.name}</Table.Cell>
               </Table.Row>
             ))}
@@ -55,10 +59,12 @@ export function AssetTypesPage() {
         title="Asset types"
         subtitle="The categories assets are filed under, as offered in the asset form's type selector."
         actions={
-          <Button variant="primary" onClick={() => setFormOpen(true)}>
-            <Plus size={18} aria-hidden="true" />
-            Create asset type
-          </Button>
+          <PermissionGate permission="assets.create">
+            <Button variant="primary" onClick={() => setFormOpen(true)}>
+              <Plus size={18} aria-hidden="true" />
+              Create asset type
+            </Button>
+          </PermissionGate>
         }
       />
 
